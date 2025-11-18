@@ -1,0 +1,23 @@
+#main-img {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+}
+
+#header-img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+.background-outer {
+    padding: 5em 0 5em 0;
+    height: 100%;
+    width: 100%;
+}
+
+.background-inner {
+    height: 100%;
+    width: 100%;
+    background-color: #4a5759;
+}
