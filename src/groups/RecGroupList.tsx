@@ -29,13 +29,36 @@ function RecGroupList(){
     ]
 
     return (
-        <div className="container">
-            <div className="row d-flex text-center py-5" style={{"textShadow": "2px 2px 4px black"}}>
-                <h4>Rekomenduojamos grupės</h4>
+        <div className="container pt-5">
+            <div className="row text-center mb-5">
+                <div className="col-12">
+                    <div style={{
+                        display: 'inline-block',
+                        position: 'relative',
+                        padding: '0 2rem'
+                    }}>
+                        <h2 className="display-5 fw-bold mb-2" style={{
+                            color: 'white',
+                            backgroundClip: 'text'
+                        }}>
+                            Rekomenduojamos grupės
+                        </h2>
+                    </div>
+                </div>
             </div>
 
-            <div className="row mb-3 d-flex align-items-end justify-content-around">
-                {groupsExample.map(g => <RecGroup {... g} />)}
+            <div className="row justify-content-center">
+                {groupsExample.map((g, index) => (
+                    <RecGroup 
+                        key={index}
+                        groupName={g.groupName}
+                        currMem={g.currMem}
+                        maxMem={g.maxMem}
+                        desc={g.desc}
+                        tags={g.tags}
+                        imageUrl={g.imageUrl}
+                    />
+                ))}
             </div>
         </div>
     )
