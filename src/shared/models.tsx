@@ -38,7 +38,8 @@ interface Post {
     author: User,
     createdAt: string,
     likes: number,
-    comments: Comment[]
+    comments: Comment[],
+    imageUrl?: string
 }
 
 interface Comment {
