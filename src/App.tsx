@@ -11,6 +11,9 @@ import { Footer } from './shared/footer/Footer';
 import About from './about/About';
 import Groups from './groups/Groups';
 import NewGroup from './newGroup/newGroup';
+import Login from './auth/login';
+import Register from './auth/register';
+import GroupDetail from './groupDetail/GroupDetail';
 
 function App() {
   return (
@@ -20,7 +23,10 @@ function App() {
         <Routes>
           <Route path="/" element={<About />}/>
           <Route path="/groups" element={<Groups />}/>
+          <Route path="/group/:id" element={<GroupDetail />}/>
           <Route path="/new-group" element={<NewGroup />}/>
+          <Route path="/login" element={<Login />}/>
+          <Route path="/register" element={<Register />}/>
         </Routes>
       </main>
       <Footer />

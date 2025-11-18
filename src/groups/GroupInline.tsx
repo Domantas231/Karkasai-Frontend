@@ -1,6 +1,7 @@
 import Tag from "./Tag"
 
 interface InlineGroupProps {
+    id?: number,
     title: string,
     currentMembers: number,
     maxMembers: number,
@@ -9,9 +10,9 @@ interface InlineGroupProps {
     imageUrl: string
 }
 
-function GroupInline({title, currentMembers, maxMembers, description, tags, imageUrl} : InlineGroupProps){
+function GroupInline({id = 1, title, currentMembers, maxMembers, description, tags, imageUrl} : InlineGroupProps){
     return (
-        <a href="#" className="list-group-item list-group-item-action">
+        <a href={`/group/${id}`} className="list-group-item list-group-item-action">
             <div className="d-flex w-100 justify-content-between align-items-center">
                 <div className="d-flex align-items-center">
                     <img src={imageUrl} className="rounded shadow me-3"/>

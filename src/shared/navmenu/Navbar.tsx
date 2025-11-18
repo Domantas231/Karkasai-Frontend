@@ -9,7 +9,7 @@ function Navbar(){
                         <li id="groups" className="nav-item"><a className="nav-link" href="/groups">Esamos grupės</a></li>
                     </ul>
                 </div>
-                <a className="btn btn-secondary me-5" href="/groups">Prisijungti</a>
+                <a className="btn btn-secondary me-5" href="/login">Prisijungti</a>
             </nav>
         </header>
     )

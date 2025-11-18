@@ -4,7 +4,7 @@ interface TagProps{
 
 function Tag({name} : TagProps){
     return (
-        <button className="btn btn-primary my-2" type="button">{name}</button>
+        <button className="btn btn-primary my-2 mx-1" type="button">{name}</button>
     )
 }
 
