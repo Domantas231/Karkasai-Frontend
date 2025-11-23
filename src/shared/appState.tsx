@@ -18,7 +18,17 @@ const STORAGE_KEY = "HabitTribe.frontend.AppState"
  */
 class AppState extends ObservableClass {
 	/** User ID, if known. */
-	userId : number = -1;
+	// set userId(value: string) {
+    //     if (value) {
+    //         window.sessionStorage.setItem(`${STORAGE_KEY}#userId`, value);
+    //     } else {
+    //         window.sessionStorage.removeItem(`${STORAGE_KEY}#userId`);
+    //     }
+    // }
+
+    // get userId(): string {
+    //     return window.sessionStorage.getItem(`${STORAGE_KEY}#userTitle`) || "";
+    // }
 
 	/** User title, if known. */
 	set userTitle(value: string) {

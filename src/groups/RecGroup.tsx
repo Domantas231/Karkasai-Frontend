@@ -1,6 +1,8 @@
 import { TagModel } from "../shared/models";
 import Tag from "./Tag"
 
+import appState from "../shared/appState";
+
 interface RecGroupProps {
     groupName: string,
     currMem: number,
@@ -106,7 +108,8 @@ function RecGroup({groupName, currMem, maxMem, desc, tags, imageUrl} : RecGroupP
                     </div>
 
                     {/* Join button */}
-                    <button 
+                    {appState.userTitle !== "" && (
+                        <button 
                         className="btn btn-primary w-100 fw-bold"
                         style={{
                             background: 'green',
@@ -129,6 +132,7 @@ function RecGroup({groupName, currMem, maxMem, desc, tags, imageUrl} : RecGroupP
                     >
                         {currMem >= maxMem ? 'Grupė pilna' : 'Prisijungti dabar'}
                     </button>
+                    )}
                 </div>
             </div>
 

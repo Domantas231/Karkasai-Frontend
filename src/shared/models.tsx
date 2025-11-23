@@ -41,7 +41,7 @@ interface GroupEditDetail {
 // }
 
 interface User {
-    username: string
+    userName: string
 }
 
 interface Post {

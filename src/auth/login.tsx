@@ -32,7 +32,9 @@ function Login() {
             // Assuming the backend returns a JWT token
             console.log(response.data)
             const token = response.data.accessToken;
+            //const userId = response.data.userId;
 
+            //appState.userId = userId;
             appState.authJwt = token;
             appState.userTitle = username;
             appState.isLoggedIn.value = true;

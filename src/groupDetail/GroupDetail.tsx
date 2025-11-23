@@ -8,13 +8,14 @@ import { GroupDetail as GroupDetailType, GroupEditDetail, Post, Comment } from '
 import config from '../shared/config';
 import backend from '../shared/backend';
 
+import appState from '../shared/appState';
+
 function GroupDetail() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [group, setGroup] = useState<GroupDetailType | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
-    const [currentUserId, setCurrentUserId] = useState<number | undefined>(1); // TODO: Get from auth context
     const [isGroupOwner, setIsGroupOwner] = useState(true);
     
     // Edit group state
@@ -37,118 +38,13 @@ function GroupDetail() {
             const groupResponse = await backend.get(`${config.backendUrl}groups/${id}`);
             const postsResponse = await backend.get(`${config.backendUrl}groups/${id}/posts`);
             
-            console.log(groupResponse)
-            console.log(postsResponse)
-
-            // // Mock data for demonstration
-            // const mockGroup: GroupDetailType = {
-            //     id: Number(id),
-            //     title: "Bėgiojimas vakarais",
-            //     description: "Bėgiojam vakarais 20:00 prie mergelių tilto į panemunės šilą! Sveiki atvykę į mūsų bėgimo grupę. Čia dalinamės patarimais, motyvuojame vieni kitus ir planuojame treniruotes.",
-            //     currentMembers: 3,
-            //     maxMembers: 5,
-            //     tags: 'patyrusiem, naujokam',
-            //     imageUrl: "https://picsum.photos/1200/400",
-            //     createdBy: {
-            //         id: 1,
-            //         username: "Jonas Jonaitis"
-            //     },
-            //     createdAt: "2024-01-15T10:00:00Z"
-            // };
-
-            // const mockPosts: Post[] = [
-            //     {
-            //         id: 1,
-            //         content: "Sveiki visi! Šiandien pasiekiau asmeninį rekordą - nubėgau 10 km per 50 minučių! 🏃‍♂️ Esu labai laimingas ir noriu padėkoti šiai grupei už motyvaciją!",
-            //         author: {
-            //             id: 2,
-            //             username: "Petras Petraitis",
-            //             avatarUrl: "https://picsum.photos/50/50?random=1"
-            //         },
-            //         createdAt: "2024-11-17T19:30:00Z",
-            //         likes: 12,
-            //         imageUrl: "https://picsum.photos/800/400?random=10",
-            //         comments: [
-            //             {
-            //                 id: 1,
-            //                 content: "Sveikinu! Tai puikus rezultatas! 🎉",
-            //                 author: {
-            //                     id: 3,
-            //                     username: "Ona Onaitė",
-            //                     avatarUrl: "https://picsum.photos/50/50?random=2"
-            //                 },
-            //                 createdAt: "2024-11-17T19:45:00Z",
-            //                 likes: 3
-            //             },
-            //             {
-            //                 id: 2,
-            //                 content: "Wow! Kaip tau pavyko taip greitai pagerinti rezultatus?",
-            //                 author: {
-            //                     id: 4,
-            //                     username: "Antanas Antanaitis",
-            //                     avatarUrl: "https://picsum.photos/50/50?random=3"
-            //                 },
-            //                 createdAt: "2024-11-17T20:00:00Z",
-            //                 likes: 1
-            //             }
-            //         ]
-            //     },
-            //     {
-            //         id: 2,
-            //         content: "Rytoj planuoju treniruotę 7:00 ryto. Kas prisijungs? Marsrutas: Nemuno sala, apie 5km.",
-            //         author: {
-            //             id: 1,
-            //             username: "Jonas Jonaitis",
-            //             avatarUrl: "https://picsum.photos/50/50?random=4"
-            //         },
-            //         createdAt: "2024-11-17T18:00:00Z",
-            //         likes: 8,
-            //         comments: [
-            //             {
-            //                 id: 3,
-            //                 content: "Aš dalyvausiu! 👍",
-            //                 author: {
-            //                     id: 2,
-            //                     username: "Petras Petraitis",
-            //                     avatarUrl: "https://picsum.photos/50/50?random=1"
-            //                 },
-            //                 createdAt: "2024-11-17T18:15:00Z",
-            //                 likes: 2
-            //             },
-            //             {
-            //                 id: 4,
-            //                 content: "Man per anksti, bet kitą kartą tikrai prisijungsiu!",
-            //                 author: {
-            //                     id: 5,
-            //                     username: "Greta Gretaitė",
-            //                     avatarUrl: "https://picsum.photos/50/50?random=5"
-            //                 },
-            //                 createdAt: "2024-11-17T18:30:00Z",
-            //                 likes: 1
-            //             }
-            //         ]
-            //     },
-            //     {
-            //         id: 3,
-            //         content: "Koks jūsų patariamas bėgimo batų modelis? Ieškau naujų ir nesu tikras ką rinktis. 👟",
-            //         author: {
-            //             id: 6,
-            //             username: "Tomas Tomaitis",
-            //             avatarUrl: "https://picsum.photos/50/50?random=6"
-            //         },
-            //         createdAt: "2024-11-17T15:00:00Z",
-            //         likes: 5,
-            //         comments: []
-            //     }
-            // ];
-
-            // setGroup(mockGroup);
-            // setPosts(mockPosts);
+            console.log('group', groupResponse)
+            console.log('posts', postsResponse)
 
             setGroup(groupResponse.data)
             setPosts(postsResponse.data)
 
-            //setIsGroupOwner(mockGroup.createdBy.id === currentUserId);
+            setIsGroupOwner(groupResponse.data.ownerUser.userName === appState.userTitle);
             
             // Initialize edit form with current group data
             setEditedGroup({
@@ -168,9 +64,6 @@ function GroupDetail() {
         setPosts(posts.map(post => 
                 post.id === postId ? { ...post, comments: newComments } : post
             ));
-
-        console.log('posts')
-        console.log(posts)
     }
 
     const handleDeletePost = async (postId: number) => {
@@ -253,6 +146,8 @@ function GroupDetail() {
     };
 
     const handleEditGroupClick = () => {
+        console.log("Group", group)
+
         setEditedGroup({
             title: group?.title || '',
             description: group?.description || '',
@@ -475,7 +370,7 @@ function GroupDetail() {
                                             ))}
                                         </div>
                                         <div className="text-muted text-center">
-                                            <small>Sukūrė: {group.ownerUser.username}</small>
+                                            <small>Sukūrė: {group.ownerUser.userName}</small>
                                         </div>
                                     </>
                                 )}
@@ -497,7 +392,6 @@ function GroupDetail() {
                                     groupId={Number(id)}
                                     key={post.id} 
                                     post={post}
-                                    currentUserId={currentUserId}
                                     updatePostComments={handleUpdatePostComments}
                                     onDeletePost={handleDeletePost}
                                     onEditPost={handleEditPost}

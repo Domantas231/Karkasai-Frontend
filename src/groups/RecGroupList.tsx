@@ -23,33 +23,6 @@ function RecGroupList(){
         fetchGroups();
     }, [])
 
-    // let groupsExample = [
-    //     {
-    //         groupName: "Bėgiojimas",
-    //         currMem: 5,
-    //         maxMem: 7,
-    //         desc: "Bėgiojam rytais 9:00 prie mergelių tilto į panemunės šilą!",
-    //         tags: ['patyrusiem', 'naujokam', 'turneriai'],
-    //         imageUrl: "https://picsum.photos/300/300"
-    //     },
-    //     {
-    //         groupName: "Sveikas maitinimasis",
-    //         currMem: 3,
-    //         maxMem: 4,
-    //         desc: "Kiekvieną dieną keliame receptus ir dalinamies savais sunkumais.",
-    //         tags: ['Virs 60m', 'kaunas', 'centras'],
-    //         imageUrl: "https://picsum.photos/300/300"
-    //     },
-    //     {
-    //         groupName: "Knygų skaitymas",
-    //         currMem: 10,
-    //         maxMem: 12,
-    //         desc: "Pasikalbam apie knygas ir dalinamies rekomendacijomis! Prie to pačio susitinkam sekmadieniais.",
-    //         tags: ['ketvirtas', 'astuntas', 'devintas'],
-    //         imageUrl: "https://picsum.photos/300/300"
-    //     }
-    // ]
-
     let groupsExample = groups?.slice(0, 3)
 
     return (

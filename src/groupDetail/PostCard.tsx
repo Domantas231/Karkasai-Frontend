@@ -3,11 +3,12 @@ import { Post, Comment } from '../shared/models';
 import CommentComponent from './CommentComponent';
 import backend from '../shared/backend';
 import config from '../shared/config';
+import appState from '../shared/appState';
 
 interface PostCardProps {
     groupId: number,
     post: Post,
-    currentUserId?: number, // Pass the current logged-in user's ID
+    currentUserId?: string, // Pass the current logged-in user's ID
     updatePostComments?: (postId: number, newComments: Comment[]) => void,
     onDeletePost?: (postId: number) => void,
     onEditPost?: (postId: number, newContent: string) => void,
@@ -101,9 +102,9 @@ function PostCard({
     };
 
     // Check if current user is the post author
-    //const isAuthor = currentUserId === post.user.id;
+    const isAuthor = appState.userTitle === post.user.userName;
 
-    const isAuthor = true
+    //const isAuthor = true
 
     return (
         <div className="card shadow mb-4">
@@ -115,10 +116,10 @@ function PostCard({
                             src='https://picsum.photos/50/50'
                             className="rounded-circle me-3" 
                             style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                            alt={post.user.username}
+                            alt={post.user.userName}
                         />
                         <div>
-                            <h5 className="mb-0">{post.user.username}</h5>
+                            <h5 className="mb-0">{post.user.userName}</h5>
                             <small className="text-muted">{formatDate(post.dateCreated)}</small>
                         </div>
                     </div>

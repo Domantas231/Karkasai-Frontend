@@ -2,11 +2,15 @@ import config from '../shared/config';
 import appState from '../shared/appState';
 import backend, { setNonAuthenticatingBackend } from '../shared/backend';
 
+import { useNavigate } from 'react-router-dom';
+
 /**
  * Log-out section in nav bar. React component.
  * @returns Component HTML.
  */
 function StatusAndLogOut() {
+	const navigate = useNavigate();
+
 	/**
 	 * Handles 'Log-out' command.
 	 */
@@ -22,7 +26,7 @@ function StatusAndLogOut() {
 		//logout ok
 		.then(resp => {			
 			//forget user information and JWT
-			appState.userId = -1;
+			//appState.userId = "";
 			appState.userTitle = "";
 			appState.authJwt = null;
 
@@ -31,16 +35,20 @@ function StatusAndLogOut() {
 
 			//indicate user is logged out
 			appState.isLoggedIn.value = false;
+
+			navigate('/')
 		})
 		//login failed or backend error, show error message
 		.catch(err => {
 			console.error('Logout error:', err);
 			// Force logout on client even if backend fails
-			appState.userId = -1;
+			//appState.userId = "";
 			appState.userTitle = "";
 			appState.authJwt = null;
 			setNonAuthenticatingBackend();
 			appState.isLoggedIn.value = false;
+
+			navigate('/')
 		});
 	}
 

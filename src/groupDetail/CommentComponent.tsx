@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Comment } from '../shared/models';
+import appState from '../shared/appState';
 
 interface CommentProps {
     comment: Comment,
-    currentUserId?: number, // Pass the current logged-in user's ID
+    currentUserId?: string, // Pass the current logged-in user's ID
     onDelete?: (commentId: number) => void,
     onEdit?: (commentId: number, newContent: string) => void
 }
@@ -42,9 +43,9 @@ function CommentComponent({ comment, currentUserId, onDelete, onEdit }: CommentP
     };
 
     // Check if current user is the comment author
-    //const isAuthor = currentUserId === comment.author.id;
+    const isAuthor = appState.userTitle === comment.user.userName;
 
-    const isAuthor = true
+    //const isAuthor = true
 
     return (
         <div className="d-flex mb-3 align-items-start">
@@ -52,12 +53,12 @@ function CommentComponent({ comment, currentUserId, onDelete, onEdit }: CommentP
                 src='https://picsum.photos/40/40'
                 className="rounded-circle me-3" 
                 style={{ width: '40px', height: '40px', objectFit: 'cover' }}
-                alt={comment.user.username}
+                alt={comment.user.userName}
             />
             <div className="flex-grow-1">
                 <div className="border rounded p-3">
                     <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h6 className="mb-0">{comment.user.username}</h6>
+                        <h6 className="mb-0">{comment.user.userName}</h6>
                         <div className="d-flex align-items-center">
                             <small className="text-muted me-2">{formatDate(comment.dateCreated)}</small>
                             {isAuthor && !isEditing && (
