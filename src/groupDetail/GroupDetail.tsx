@@ -4,7 +4,7 @@ import HeaderImage from '../shared/headerimage/headerImage';
 import PostCard from './PostCard';
 import NewPostForm from './NewPostForm';
 import Tag from '../groups/Tag';
-import { GroupDetail as GroupDetailType, Post } from '../shared/models';
+import { GroupDetail as GroupDetailType, GroupEditDetail, Post, Comment } from '../shared/models';
 import config from '../shared/config';
 import backend from '../shared/backend';
 
@@ -15,15 +15,15 @@ function GroupDetail() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentUserId, setCurrentUserId] = useState<number | undefined>(1); // TODO: Get from auth context
-    const [isGroupOwner, setIsGroupOwner] = useState(false);
+    const [isGroupOwner, setIsGroupOwner] = useState(true);
     
     // Edit group state
     const [isEditingGroup, setIsEditingGroup] = useState(false);
-    const [editedGroup, setEditedGroup] = useState({
+    const [editedGroup, setEditedGroup] = useState<GroupEditDetail>({
         title: '',
         description: '',
         maxMembers: 0,
-        tags: ''
+        tagIds: []
     });
 
     useEffect(() => {
@@ -32,122 +32,130 @@ function GroupDetail() {
 
     const fetchGroupData = async () => {
         try {
-            // TODO: Replace with actual API calls
-            // const groupResponse = await backend.get(`${config.backendUrl}group/${id}`);
-            // const postsResponse = await backend.get(`${config.backendUrl}group/${id}/posts`);
+            console.log(id)
+
+            const groupResponse = await backend.get(`${config.backendUrl}groups/${id}`);
+            const postsResponse = await backend.get(`${config.backendUrl}groups/${id}/posts`);
             
-            // Mock data for demonstration
-            const mockGroup: GroupDetailType = {
-                id: Number(id),
-                title: "Bėgiojimas vakarais",
-                description: "Bėgiojam vakarais 20:00 prie mergelių tilto į panemunės šilą! Sveiki atvykę į mūsų bėgimo grupę. Čia dalinamės patarimais, motyvuojame vieni kitus ir planuojame treniruotes.",
-                currentMembers: 3,
-                maxMembers: 5,
-                tags: 'patyrusiem, naujokam',
-                imageUrl: "https://picsum.photos/1200/400",
-                createdBy: {
-                    id: 1,
-                    username: "Jonas Jonaitis"
-                },
-                createdAt: "2024-01-15T10:00:00Z"
-            };
+            console.log(groupResponse)
+            console.log(postsResponse)
 
-            const mockPosts: Post[] = [
-                {
-                    id: 1,
-                    content: "Sveiki visi! Šiandien pasiekiau asmeninį rekordą - nubėgau 10 km per 50 minučių! 🏃‍♂️ Esu labai laimingas ir noriu padėkoti šiai grupei už motyvaciją!",
-                    author: {
-                        id: 2,
-                        username: "Petras Petraitis",
-                        avatarUrl: "https://picsum.photos/50/50?random=1"
-                    },
-                    createdAt: "2024-11-17T19:30:00Z",
-                    likes: 12,
-                    imageUrl: "https://picsum.photos/800/400?random=10",
-                    comments: [
-                        {
-                            id: 1,
-                            content: "Sveikinu! Tai puikus rezultatas! 🎉",
-                            author: {
-                                id: 3,
-                                username: "Ona Onaitė",
-                                avatarUrl: "https://picsum.photos/50/50?random=2"
-                            },
-                            createdAt: "2024-11-17T19:45:00Z",
-                            likes: 3
-                        },
-                        {
-                            id: 2,
-                            content: "Wow! Kaip tau pavyko taip greitai pagerinti rezultatus?",
-                            author: {
-                                id: 4,
-                                username: "Antanas Antanaitis",
-                                avatarUrl: "https://picsum.photos/50/50?random=3"
-                            },
-                            createdAt: "2024-11-17T20:00:00Z",
-                            likes: 1
-                        }
-                    ]
-                },
-                {
-                    id: 2,
-                    content: "Rytoj planuoju treniruotę 7:00 ryto. Kas prisijungs? Marsrutas: Nemuno sala, apie 5km.",
-                    author: {
-                        id: 1,
-                        username: "Jonas Jonaitis",
-                        avatarUrl: "https://picsum.photos/50/50?random=4"
-                    },
-                    createdAt: "2024-11-17T18:00:00Z",
-                    likes: 8,
-                    comments: [
-                        {
-                            id: 3,
-                            content: "Aš dalyvausiu! 👍",
-                            author: {
-                                id: 2,
-                                username: "Petras Petraitis",
-                                avatarUrl: "https://picsum.photos/50/50?random=1"
-                            },
-                            createdAt: "2024-11-17T18:15:00Z",
-                            likes: 2
-                        },
-                        {
-                            id: 4,
-                            content: "Man per anksti, bet kitą kartą tikrai prisijungsiu!",
-                            author: {
-                                id: 5,
-                                username: "Greta Gretaitė",
-                                avatarUrl: "https://picsum.photos/50/50?random=5"
-                            },
-                            createdAt: "2024-11-17T18:30:00Z",
-                            likes: 1
-                        }
-                    ]
-                },
-                {
-                    id: 3,
-                    content: "Koks jūsų patariamas bėgimo batų modelis? Ieškau naujų ir nesu tikras ką rinktis. 👟",
-                    author: {
-                        id: 6,
-                        username: "Tomas Tomaitis",
-                        avatarUrl: "https://picsum.photos/50/50?random=6"
-                    },
-                    createdAt: "2024-11-17T15:00:00Z",
-                    likes: 5,
-                    comments: []
-                }
-            ];
+            // // Mock data for demonstration
+            // const mockGroup: GroupDetailType = {
+            //     id: Number(id),
+            //     title: "Bėgiojimas vakarais",
+            //     description: "Bėgiojam vakarais 20:00 prie mergelių tilto į panemunės šilą! Sveiki atvykę į mūsų bėgimo grupę. Čia dalinamės patarimais, motyvuojame vieni kitus ir planuojame treniruotes.",
+            //     currentMembers: 3,
+            //     maxMembers: 5,
+            //     tags: 'patyrusiem, naujokam',
+            //     imageUrl: "https://picsum.photos/1200/400",
+            //     createdBy: {
+            //         id: 1,
+            //         username: "Jonas Jonaitis"
+            //     },
+            //     createdAt: "2024-01-15T10:00:00Z"
+            // };
 
-            setGroup(mockGroup);
-            setPosts(mockPosts);
-            setIsGroupOwner(mockGroup.createdBy.id === currentUserId);
+            // const mockPosts: Post[] = [
+            //     {
+            //         id: 1,
+            //         content: "Sveiki visi! Šiandien pasiekiau asmeninį rekordą - nubėgau 10 km per 50 minučių! 🏃‍♂️ Esu labai laimingas ir noriu padėkoti šiai grupei už motyvaciją!",
+            //         author: {
+            //             id: 2,
+            //             username: "Petras Petraitis",
+            //             avatarUrl: "https://picsum.photos/50/50?random=1"
+            //         },
+            //         createdAt: "2024-11-17T19:30:00Z",
+            //         likes: 12,
+            //         imageUrl: "https://picsum.photos/800/400?random=10",
+            //         comments: [
+            //             {
+            //                 id: 1,
+            //                 content: "Sveikinu! Tai puikus rezultatas! 🎉",
+            //                 author: {
+            //                     id: 3,
+            //                     username: "Ona Onaitė",
+            //                     avatarUrl: "https://picsum.photos/50/50?random=2"
+            //                 },
+            //                 createdAt: "2024-11-17T19:45:00Z",
+            //                 likes: 3
+            //             },
+            //             {
+            //                 id: 2,
+            //                 content: "Wow! Kaip tau pavyko taip greitai pagerinti rezultatus?",
+            //                 author: {
+            //                     id: 4,
+            //                     username: "Antanas Antanaitis",
+            //                     avatarUrl: "https://picsum.photos/50/50?random=3"
+            //                 },
+            //                 createdAt: "2024-11-17T20:00:00Z",
+            //                 likes: 1
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         id: 2,
+            //         content: "Rytoj planuoju treniruotę 7:00 ryto. Kas prisijungs? Marsrutas: Nemuno sala, apie 5km.",
+            //         author: {
+            //             id: 1,
+            //             username: "Jonas Jonaitis",
+            //             avatarUrl: "https://picsum.photos/50/50?random=4"
+            //         },
+            //         createdAt: "2024-11-17T18:00:00Z",
+            //         likes: 8,
+            //         comments: [
+            //             {
+            //                 id: 3,
+            //                 content: "Aš dalyvausiu! 👍",
+            //                 author: {
+            //                     id: 2,
+            //                     username: "Petras Petraitis",
+            //                     avatarUrl: "https://picsum.photos/50/50?random=1"
+            //                 },
+            //                 createdAt: "2024-11-17T18:15:00Z",
+            //                 likes: 2
+            //             },
+            //             {
+            //                 id: 4,
+            //                 content: "Man per anksti, bet kitą kartą tikrai prisijungsiu!",
+            //                 author: {
+            //                     id: 5,
+            //                     username: "Greta Gretaitė",
+            //                     avatarUrl: "https://picsum.photos/50/50?random=5"
+            //                 },
+            //                 createdAt: "2024-11-17T18:30:00Z",
+            //                 likes: 1
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         id: 3,
+            //         content: "Koks jūsų patariamas bėgimo batų modelis? Ieškau naujų ir nesu tikras ką rinktis. 👟",
+            //         author: {
+            //             id: 6,
+            //             username: "Tomas Tomaitis",
+            //             avatarUrl: "https://picsum.photos/50/50?random=6"
+            //         },
+            //         createdAt: "2024-11-17T15:00:00Z",
+            //         likes: 5,
+            //         comments: []
+            //     }
+            // ];
+
+            // setGroup(mockGroup);
+            // setPosts(mockPosts);
+
+            setGroup(groupResponse.data)
+            setPosts(postsResponse.data)
+
+            //setIsGroupOwner(mockGroup.createdBy.id === currentUserId);
             
             // Initialize edit form with current group data
             setEditedGroup({
-                title: mockGroup.title,
-                description: mockGroup.description,
-                maxMembers: mockGroup.maxMembers,
-                tags: mockGroup.tags
+                title: groupResponse.data.title || '',
+                description: groupResponse.data.description || '',
+                maxMembers: groupResponse.data.maxMembers || 0,
+                tagIds: groupResponse.data.tags.map((t: { id: number; }) => t.id) || []
             });
         } catch (error) {
             console.error('Error fetching group data:', error);
@@ -156,10 +164,19 @@ function GroupDetail() {
         }
     };
 
+    const handleUpdatePostComments = (postId: number, newComments: Comment[]) => {
+        setPosts(posts.map(post => 
+                post.id === postId ? { ...post, comments: newComments } : post
+            ));
+
+        console.log('posts')
+        console.log(posts)
+    }
+
     const handleDeletePost = async (postId: number) => {
         try {
             // TODO: Send delete request to backend
-            // await backend.delete(`${config.backendUrl}group/${id}/post/${postId}`);
+            await backend.delete(`${config.backendUrl}groups/${id}/posts/${postId}`);
             
             console.log('Deleting post:', postId);
             setPosts(posts.filter(post => post.id !== postId));
@@ -169,14 +186,14 @@ function GroupDetail() {
         }
     };
 
-    const handleEditPost = async (postId: number, newContent: string) => {
+    const handleEditPost = async (postId: number, newTitle: string) => {
         try {
             // TODO: Send update request to backend
-            // await backend.put(`${config.backendUrl}group/${id}/post/${postId}`, { content: newContent });
+            await backend.put(`${config.backendUrl}groups/${id}/posts/${postId}`, { title: newTitle });
             
-            console.log('Editing post:', postId, newContent);
+            console.log('Editing post:', postId, newTitle);
             setPosts(posts.map(post => 
-                post.id === postId ? { ...post, content: newContent } : post
+                post.id === postId ? { ...post, title: newTitle } : post
             ));
         } catch (error) {
             console.error('Error editing post:', error);
@@ -187,7 +204,7 @@ function GroupDetail() {
     const handleDeleteComment = async (postId: number, commentId: number) => {
         try {
             // TODO: Send delete request to backend
-            // await backend.delete(`${config.backendUrl}group/${id}/post/${postId}/comment/${commentId}`);
+            await backend.delete(`${config.backendUrl}groups/${id}/posts/${postId}/comments/${commentId}`);
             
             console.log('Deleting comment:', commentId, 'from post:', postId);
             setPosts(posts.map(post => 
@@ -204,7 +221,7 @@ function GroupDetail() {
     const handleEditComment = async (postId: number, commentId: number, newContent: string) => {
         try {
             // TODO: Send update request to backend
-            // await backend.put(`${config.backendUrl}group/${id}/post/${postId}/comment/${commentId}`, { content: newContent });
+            await backend.put(`${config.backendUrl}groups/${id}/posts/${postId}/comments/${commentId}`, { content: newContent });
             
             console.log('Editing comment:', commentId, 'from post:', postId, newContent);
             setPosts(posts.map(post => 
@@ -226,11 +243,7 @@ function GroupDetail() {
     const handleDeleteGroup = async () => {
         if (window.confirm('Ar tikrai norite ištrinti šią grupę? Šis veiksmas negrįžtamas.')) {
             try {
-                // TODO: Send delete request to backend
-                // await backend.delete(`${config.backendUrl}group/${id}`);
-                
-                console.log('Deleting group:', id);
-                alert('Grupė ištrinta sėkmingai');
+                await backend.delete(`${config.backendUrl}groups/${id}`);
                 navigate('/groups');
             } catch (error) {
                 console.error('Error deleting group:', error);
@@ -244,9 +257,10 @@ function GroupDetail() {
             title: group?.title || '',
             description: group?.description || '',
             maxMembers: group?.maxMembers || 0,
-            tags: group?.tags || ''
+            tagIds: group?.tags.map(t => t.id) || []
         });
         setIsEditingGroup(true);
+        console.log(group)
     };
 
     const handleEditGroupCancel = () => {
@@ -254,9 +268,8 @@ function GroupDetail() {
             title: group?.title || '',
             description: group?.description || '',
             maxMembers: group?.maxMembers || 0,
-            tags: group?.tags || ''
+            tagIds: group?.tags.map(t => t.id) || []
         });
-        setIsEditingGroup(false);
     };
 
     const handleEditGroupSubmit = async (e: React.FormEvent) => {
@@ -277,8 +290,7 @@ function GroupDetail() {
         }
 
         try {
-            // TODO: Send update request to backend
-            // await backend.put(`${config.backendUrl}group/${id}`, editedGroup);
+            await backend.put(`${config.backendUrl}groups/${id}`, editedGroup);
             
             console.log('Updating group:', editedGroup);
             
@@ -288,8 +300,7 @@ function GroupDetail() {
                     ...group,
                     title: editedGroup.title,
                     description: editedGroup.description,
-                    maxMembers: editedGroup.maxMembers,
-                    tags: editedGroup.tags
+                    maxMembers: editedGroup.maxMembers
                 });
             }
             
@@ -394,7 +405,7 @@ function GroupDetail() {
                                                 </small>
                                             </div>
 
-                                            <div className="col-md-6">
+                                            {/* <div className="col-md-6">
                                                 <label htmlFor="groupTags" className="form-label">
                                                     Žymos (atskirtos kableliais)
                                                 </label>
@@ -409,7 +420,7 @@ function GroupDetail() {
                                                     })}
                                                     placeholder="pvz: naujokams, pažengusiems"
                                                 />
-                                            </div>
+                                            </div> */}
                                         </div>
 
                                         <div className="d-flex gap-2 justify-content-end">
@@ -459,12 +470,12 @@ function GroupDetail() {
                                         </div>
                                         <p className="mb-3">{group.description}</p>
                                         <div className="mb-3 d-flex justify-content-center">
-                                            {group.tags.split(',').map((tag, index) => (
-                                                <Tag key={index} name={tag.trim()} />
+                                            {group.tags.map((tag) => (
+                                                <Tag key={tag.id} name={tag.name} />
                                             ))}
                                         </div>
                                         <div className="text-muted text-center">
-                                            <small>Sukūrė: {group.createdBy.username}</small>
+                                            <small>Sukūrė: {group.ownerUser.username}</small>
                                         </div>
                                     </>
                                 )}
@@ -483,9 +494,11 @@ function GroupDetail() {
                         {posts.length > 0 ? (
                             posts.map(post => (
                                 <PostCard 
+                                    groupId={Number(id)}
                                     key={post.id} 
                                     post={post}
                                     currentUserId={currentUserId}
+                                    updatePostComments={handleUpdatePostComments}
                                     onDeletePost={handleDeletePost}
                                     onEditPost={handleEditPost}
                                     onDeleteComment={handleDeleteComment}

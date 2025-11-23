@@ -1,11 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Select, { StylesConfig } from 'react-select'
 
 import config from '../shared/config'
 import backend from "../shared/backend"
 
+import { TagModel, TagOption } from "../shared/models";
+
 function NewGroupForm(){
-    const [selectedTags, setSelectedTags] = useState({})
+    const [selectedTags, setSelectedTags] = useState<TagOption[]>([])
+    const [tags, setTags] = useState<TagModel[]>()
 
     function handleFormSubmit(formData: FormData){
         const groupName = formData.get("groupName")
@@ -16,7 +19,7 @@ function NewGroupForm(){
             title: groupName,
             description: desc,
             maxMembers: Number(maxMem),
-            tagIds: [2]
+            tagIds: selectedTags.map(s => s.value)
         }
 
         console.log(newGroup);
@@ -82,11 +85,29 @@ function NewGroupForm(){
         })
     }
 
-    const options = [
-        {value: 'naujokams', label: 'Naujokams'},
-        {value: 'pradedantiesiems', label: 'Pradedantiesiems'},
-        {value: 'pazengusiems', label: 'Pažengusiems'}
-    ]
+    useEffect(() => {
+        const fecthTags = async () => {
+            try {
+                console.log(config.backendUrl + 'group')
+                const response = await backend.get<TagModel[]>(config.backendUrl + 'tags')
+                setTags(response.data)
+                console.log(response.data)
+            }
+            catch (error) {
+                console.log('Failed to fetch data');
+            }
+        }
+        
+        fecthTags();
+    }, [])
+
+    // const options = [
+    //     {value: 'naujokams', label: 'Naujokams'},
+    //     {value: 'pradedantiesiems', label: 'Pradedantiesiems'},
+    //     {value: 'pazengusiems', label: 'Pažengusiems'}
+    // ]
+
+    const options = tags?.map(t => ({value: t.id, label: t.name}))
 
     return (
         <div className="container py-5">
@@ -201,7 +222,7 @@ function NewGroupForm(){
                                             <Select 
                                                 options={options} 
                                                 value={selectedTags} 
-                                                onChange={(selected) => setSelectedTags(selected)}
+                                                onChange={(selected) => setSelectedTags(selected as TagOption[])}
                                                 classNamePrefix="select" 
                                                 className="basic-multi-select" 
                                                 isMulti 

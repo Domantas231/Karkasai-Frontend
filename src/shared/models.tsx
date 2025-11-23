@@ -1,9 +1,10 @@
 interface GroupForL {
+    id: number,
     title: string,
     description: string,
     currentMembers: number,
     maxMembers: number,
-    tags: string
+    tags: TagModel[]
 }
 
 class GroupForCU {
@@ -20,34 +21,52 @@ interface GroupDetail {
     description: string,
     currentMembers: number,
     maxMembers: number,
-    tags: string,
+    tags: TagModel[],
     imageUrl: string,
-    createdBy: User,
+    ownerUser: User,
     createdAt: string
 }
 
+interface GroupEditDetail {
+    title: string,
+    description: string,
+    maxMembers: number,
+    tagIds: number[]
+}
+
+// interface User {
+//     id: number,
+//     username: string,
+//     avatarUrl?: string
+// }
+
 interface User {
-    id: number,
-    username: string,
-    avatarUrl?: string
+    username: string
 }
 
 interface Post {
     id: number,
-    content: string,
-    author: User,
-    createdAt: string,
-    likes: number,
-    comments: Comment[],
-    imageUrl?: string
+    title: string,
+    user: User,
+    dateCreated: string,
+    comments: Comment[]
 }
 
 interface Comment {
     id: number,
     content: string,
-    author: User,
-    createdAt: string,
-    likes: number
+    user: User,
+    dateCreated: string,
+}
+
+interface TagModel {
+    id: number,
+    name: string
+}
+
+interface TagOption {
+    value: string,
+    label: string;
 }
 
 export type {
@@ -55,7 +74,10 @@ export type {
     GroupDetail,
     User,
     Post,
-    Comment
+    Comment,
+    TagModel,
+    TagOption, 
+    GroupEditDetail
 }
 
 export {

@@ -1,19 +1,25 @@
-import { useState } from 'react';
-import { Post } from '../shared/models';
+import { useState, useEffect } from 'react';
+import { Post, Comment } from '../shared/models';
 import CommentComponent from './CommentComponent';
+import backend from '../shared/backend';
+import config from '../shared/config';
 
 interface PostCardProps {
+    groupId: number,
     post: Post,
     currentUserId?: number, // Pass the current logged-in user's ID
+    updatePostComments?: (postId: number, newComments: Comment[]) => void,
     onDeletePost?: (postId: number) => void,
     onEditPost?: (postId: number, newContent: string) => void,
     onDeleteComment?: (postId: number, commentId: number) => void,
     onEditComment?: (postId: number, commentId: number, newContent: string) => void
 }
 
-function PostCard({ 
+function PostCard({
+    groupId, 
     post, 
     currentUserId,
+    updatePostComments,
     onDeletePost,
     onEditPost,
     onDeleteComment,
@@ -22,7 +28,24 @@ function PostCard({
     const [showComments, setShowComments] = useState(true);
     const [newComment, setNewComment] = useState('');
     const [isEditingPost, setIsEditingPost] = useState(false);
-    const [editedPostContent, setEditedPostContent] = useState(post.content);
+    const [editedPostContent, setEditedPostContent] = useState(post.title);
+    const [comments, setComments] = useState<Comment[]>([]);
+
+    useEffect(() => {
+        fetchCommentData();
+    }, []);
+
+    const fetchCommentData = async () => {
+        try {
+            const commentsResponse = await backend.get(`${config.backendUrl}groups/${groupId}/posts/${post.id}/comments`);
+            console.log(commentsResponse)
+
+            updatePostComments?.(post.id, commentsResponse.data as Comment[])
+        }
+        catch (error) {
+            console.error('Error fetching group data:', error);
+        }
+    }
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -35,24 +58,31 @@ function PostCard({
         });
     };
 
-    const handleCommentSubmit = (e: React.FormEvent) => {
+    const handleCommentSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (newComment.trim()) {
-            // TODO: Send comment to backend
-            console.log('New comment:', newComment);
+            try {
+                await backend.post(`${config.backendUrl}groups/${groupId}/posts/${post.id}/comments`, {content: newComment})
+
+                fetchCommentData();
+            }
+            catch (error) {
+                console.log(error)
+            }
+
             setNewComment('');
         }
     };
 
     const handlePostEditSubmit = () => {
-        if (editedPostContent.trim() && editedPostContent !== post.content) {
+        if (editedPostContent.trim() && editedPostContent !== post.title) {
             onEditPost?.(post.id, editedPostContent);
         }
         setIsEditingPost(false);
     };
 
     const handlePostEditCancel = () => {
-        setEditedPostContent(post.content);
+        setEditedPostContent(post.title);
         setIsEditingPost(false);
     };
 
@@ -71,7 +101,9 @@ function PostCard({
     };
 
     // Check if current user is the post author
-    const isAuthor = currentUserId === post.author.id;
+    //const isAuthor = currentUserId === post.user.id;
+
+    const isAuthor = true
 
     return (
         <div className="card shadow mb-4">
@@ -80,14 +112,14 @@ function PostCard({
                 <div className="d-flex align-items-center justify-content-between mb-3">
                     <div className="d-flex align-items-center">
                         <img 
-                            src={post.author.avatarUrl || 'https://picsum.photos/50/50'} 
+                            src='https://picsum.photos/50/50'
                             className="rounded-circle me-3" 
                             style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                            alt={post.author.username}
+                            alt={post.user.username}
                         />
                         <div>
-                            <h5 className="mb-0">{post.author.username}</h5>
-                            <small className="text-muted">{formatDate(post.createdAt)}</small>
+                            <h5 className="mb-0">{post.user.username}</h5>
+                            <small className="text-muted">{formatDate(post.dateCreated)}</small>
                         </div>
                     </div>
                     
@@ -137,13 +169,13 @@ function PostCard({
                     </div>
                 ) : (
                     <>
-                        <p className="card-text mb-3">{post.content}</p>
+                        <p className="card-text mb-3">{post.title}</p>
                         
                         {/* Post Image */}
-                        {post.imageUrl && (
+                        {(
                             <div className="mb-3">
                                 <img 
-                                    src={post.imageUrl} 
+                                    src='https://picsum.photos/50/50'
                                     className="img-fluid rounded" 
                                     alt="Post attachment"
                                     style={{ maxHeight: '500px', objectFit: 'cover', width: '100%' }}
@@ -175,11 +207,11 @@ function PostCard({
 
                         {/* Comments List */}
                         <div>
-                            {post.comments.length > 0 ? (
-                                post.comments.map(comment => (
+                            {post.comments?.length > 0 ? (
+                                post.comments.map(c => (
                                     <CommentComponent 
-                                        key={comment.id} 
-                                        comment={comment}
+                                        key={c.id} 
+                                        comment={c}
                                         currentUserId={currentUserId}
                                         onDelete={handleCommentDelete}
                                         onEdit={handleCommentEdit}

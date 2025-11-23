@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import backend from '../shared/backend';
+import config from '../shared/config';
 
 interface NewPostFormProps {
     groupId: number,
@@ -19,11 +21,7 @@ function NewPostForm({ groupId, onPostCreated }: NewPostFormProps) {
         setIsSubmitting(true);
         
         try {
-            // TODO: Send post to backend
-            console.log('Creating post:', { groupId, content });
-            
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await backend.post(`${config.backendUrl}groups/${groupId}/posts`, {title: content});
             
             setContent('');
             if (onPostCreated) {

@@ -17,8 +17,7 @@ function AllGroups(){
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-                console.log(config.backendUrl + 'group')
-                const response = await backend.get<GroupForL[]>(config.backendUrl + 'group')
+                const response = await backend.get<GroupForL[]>(config.backendUrl + 'groups')
                 setGroups(response.data)
                 console.log(response.data)
             }
@@ -72,10 +71,10 @@ function AllGroups(){
 
             <div className="list-group mb-5">
                 { filter !== '' ?
-                groupsExample.filter(g => g.title.toLowerCase().includes(filter.toLowerCase())).map((g, index) => 
+                groups.filter(g => g.title.toLowerCase().includes(filter.toLowerCase())).map((g) => 
                     <GroupInline 
-                        key={g.title} 
-                        id={index + 1} 
+                        key={g.id} 
+                        id={g.id} 
                         title={g.title}
                         currentMembers={g.currentMembers}
                         maxMembers={g.maxMembers}
@@ -85,10 +84,10 @@ function AllGroups(){
                     />
                 )
                 :
-                groupsExample.map((g, index) => 
+                groups.map((g) => 
                     <GroupInline 
-                        key={g.title} 
-                        id={index + 1}
+                        key={g.id} 
+                        id={g.id}
                         title={g.title}
                         currentMembers={g.currentMembers}
                         maxMembers={g.maxMembers}

@@ -1,3 +1,4 @@
+import { TagModel } from "../shared/models";
 import Tag from "./Tag"
 
 interface RecGroupProps {
@@ -5,7 +6,7 @@ interface RecGroupProps {
     currMem: number,
     maxMem: number,
     desc: string,
-    tags: Array<string>,
+    tags: TagModel[],
     imageUrl: string
 }
 
@@ -76,9 +77,9 @@ function RecGroup({groupName, currMem, maxMem, desc, tags, imageUrl} : RecGroupP
 
                     {/* Tags */}
                     <div className="mb-3 d-flex flex-wrap gap-2">
-                        {tags.map((t, index) => (
+                        {tags.map((t) => (
                             <span 
-                                key={index}
+                                key={t.id}
                                 style={{
                                     background: 'blue',
                                     color: 'white',
@@ -99,7 +100,7 @@ function RecGroup({groupName, currMem, maxMem, desc, tags, imageUrl} : RecGroupP
                                     e.currentTarget.style.boxShadow = '0 2px 5px rgba(102, 126, 234, 0.3)';
                                 }}
                             >
-                                {t}
+                                {t.name}
                             </span>
                         ))}
                     </div>

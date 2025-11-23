@@ -42,22 +42,24 @@ function CommentComponent({ comment, currentUserId, onDelete, onEdit }: CommentP
     };
 
     // Check if current user is the comment author
-    const isAuthor = currentUserId === comment.author.id;
+    //const isAuthor = currentUserId === comment.author.id;
+
+    const isAuthor = true
 
     return (
         <div className="d-flex mb-3 align-items-start">
             <img 
-                src={comment.author.avatarUrl || 'https://picsum.photos/40/40'} 
+                src='https://picsum.photos/40/40'
                 className="rounded-circle me-3" 
                 style={{ width: '40px', height: '40px', objectFit: 'cover' }}
-                alt={comment.author.username}
+                alt={comment.user.username}
             />
             <div className="flex-grow-1">
                 <div className="border rounded p-3">
                     <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h6 className="mb-0">{comment.author.username}</h6>
+                        <h6 className="mb-0">{comment.user.username}</h6>
                         <div className="d-flex align-items-center">
-                            <small className="text-muted me-2">{formatDate(comment.createdAt)}</small>
+                            <small className="text-muted me-2">{formatDate(comment.dateCreated)}</small>
                             {isAuthor && !isEditing && (
                                 <div className="btn-group btn-group-sm">
                                     <button 

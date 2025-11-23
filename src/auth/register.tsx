@@ -41,7 +41,7 @@ function Register() {
         setIsLoading(true);
 
         try {
-            await backend.post(config.backendUrl + 'auth/register', {
+            await backend.post(config.backendUrl + 'accounts', {
                 email: formData.email,
                 password: formData.password,
                 username: formData.username

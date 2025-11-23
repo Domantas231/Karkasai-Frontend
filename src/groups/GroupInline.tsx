@@ -1,12 +1,14 @@
 import Tag from "./Tag"
 
+import { TagModel } from "../shared/models";
+
 interface InlineGroupProps {
     id?: number,
     title: string,
     currentMembers: number,
     maxMembers: number,
     description: string,
-    tags: string,
+    tags: TagModel[],
     imageUrl: string
 }
 
@@ -23,8 +25,7 @@ function GroupInline({id = 1, title, currentMembers, maxMembers, description, ta
                 </div>
                 
                 <div>
-                    <Tag name={tags} />
-                    {/* {tags.map(t => <Tag name={t} />)} */}
+                    {tags.map(t => <Tag name={t.name} />)}
                 </div>
                 <span className="badge text-bg-primary rounded-pill">{currentMembers} / {maxMembers}</span>
             </div>
