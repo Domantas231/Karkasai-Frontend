@@ -12,8 +12,8 @@ function StatusAndLogOut() {
 	 */
 	let onLogOut = () => {
 		//send log-out request to the backend
-		backend.get(
-			config.backendUrl + "/auth/logout",
+		backend.post(
+			config.backendUrl + "logout",
 			{
 				params : {					
 				}
@@ -24,7 +24,7 @@ function StatusAndLogOut() {
 			//forget user information and JWT
 			appState.userId = -1;
 			appState.userTitle = "";
-			appState.authJwt = "";
+			appState.authJwt = null;
 
 			//switch back non-authenticating backend connector
 			setNonAuthenticatingBackend();
@@ -34,7 +34,13 @@ function StatusAndLogOut() {
 		})
 		//login failed or backend error, show error message
 		.catch(err => {
-			//TODO: show some kind of error dialog? assume user is logged out anyway?
+			console.error('Logout error:', err);
+			// Force logout on client even if backend fails
+			appState.userId = -1;
+			appState.userTitle = "";
+			appState.authJwt = null;
+			setNonAuthenticatingBackend();
+			appState.isLoggedIn.value = false;
 		});
 	}
 

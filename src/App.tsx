@@ -69,7 +69,7 @@ function App() {
 		});
 
 		//if JWT is set, replace backend connector with authenticating one
-		if( appState.authJwt != null ) {
+		if( appState.authJwt != null && appState.authJwt !== "" ) {
 			setAuthenticatingBackend(appState.authJwt);
 			appState.isLoggedIn.value = true;
 		}

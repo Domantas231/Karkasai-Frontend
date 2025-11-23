@@ -27,7 +27,8 @@ function setAuthenticatingBackend(jwt : string) {
         axios.create({
             headers : {
                 Authorization: `Bearer ${jwt}`
-            }
+            },
+            withCredentials: true
         });
 }
 
@@ -35,7 +36,9 @@ function setAuthenticatingBackend(jwt : string) {
  * Set backend connector to non-authenticating version.
  */
 function setNonAuthenticatingBackend() {
-    backend = axios.create();
+    backend = axios.create({
+        withCredentials: true
+    });
 }
 
 //

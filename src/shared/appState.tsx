@@ -21,7 +21,17 @@ class AppState extends ObservableClass {
 	userId : number = -1;
 
 	/** User title, if known. */
-	userTitle : string = "";
+	set userTitle(value: string) {
+        if (value) {
+            window.sessionStorage.setItem(`${STORAGE_KEY}#userTitle`, value);
+        } else {
+            window.sessionStorage.removeItem(`${STORAGE_KEY}#userTitle`);
+        }
+    }
+
+    get userTitle(): string {
+        return window.sessionStorage.getItem(`${STORAGE_KEY}#userTitle`) || "";
+    }
 	
 	/** Indicates if user is considered to be logged in. */
 	isLoggedIn = this.observableProperty<boolean>(false);
@@ -31,7 +41,7 @@ class AppState extends ObservableClass {
 
 	/** Authentication token. Setter. */
 	set authJwt(value : string | null) {
-		if( value == null )
+		if( value == null || value === "" )
 			window.sessionStorage.removeItem(`${STORAGE_KEY}#jwt`);
 		else
 			window.sessionStorage.setItem(`${STORAGE_KEY}#jwt`, value);

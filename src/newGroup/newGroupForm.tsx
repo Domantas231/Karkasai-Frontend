@@ -11,22 +11,22 @@ function NewGroupForm(){
         const groupName = formData.get("groupName")
         const desc = formData.get("description")
         const maxMem = formData.get("maxMembers")
-        const anyone = formData.get("anyoneJoin")
 
         const newGroup = {
             title: groupName,
             description: desc,
-            open: anyone === 'true' ? true : false,
             maxMembers: Number(maxMem),
-            userId: 1,
-            tags: "not implemented"
+            tagIds: [2]
         }
 
         console.log(newGroup);
 
-        backend.post(config.backendUrl + 'group', newGroup)
-
-        alert(`Grupė "${groupName}" sėkmingai sukurta!`)
+        try {
+            backend.post(config.backendUrl + 'groups', newGroup)
+        }
+        catch(err: any){
+            console.error('Post error:', err);
+        }
     }
 
     const customStyles: StylesConfig = {
