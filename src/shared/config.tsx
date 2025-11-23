@@ -3,7 +3,7 @@
  */
 class Config {
 	/** Backend URL. */
-	backendUrl = "http://localhost:5203/api/";
+	backendUrl = "http://localhost:5000/api/";
 }
 
 //export default instance

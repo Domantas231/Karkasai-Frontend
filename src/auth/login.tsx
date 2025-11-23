@@ -4,8 +4,10 @@ import HeaderImage from '../shared/headerimage/headerImage';
 import backend, { setAuthenticatingBackend } from '../shared/backend';
 import config from '../shared/config';
 
+import appState from '../shared/appState';
+
 function Login() {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -16,18 +18,25 @@ function Login() {
         setError('');
         setIsLoading(true);
 
+        console.log(JSON.stringify({
+                username,
+                password
+            }))
+
         try {
-            const response = await backend.post(config.backendUrl + 'auth/login', {
-                email,
+            const response = await backend.post(config.backendUrl + 'login', {
+                username,
                 password
             });
 
             // Assuming the backend returns a JWT token
-            const { token } = response.data;
-            
-            // Store the token
-            sessionStorage.setItem('jwt', token);
-            
+            console.log(response.data)
+            const token = response.data.accessToken;
+
+            appState.authJwt = token;
+            appState.userTitle = username;
+            appState.isLoggedIn.value = true;
+
             // Set up authenticated backend
             setAuthenticatingBackend(token);
             
@@ -64,15 +73,15 @@ function Login() {
 
                                 <form onSubmit={handleSubmit}>
                                     <div className="mb-3">
-                                        <label htmlFor="email" className="form-label">
-                                            El. paštas
+                                        <label htmlFor="username" className="form-label">
+                                            Slapyvardis
                                         </label>
                                         <input
-                                            type="email"
+                                            type="username"
                                             className="form-control"
-                                            id="email"
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
+                                            id="username"
+                                            value={username}
+                                            onChange={(e) => setUsername(e.target.value)}
                                             required
                                             disabled={isLoading}
                                         />
