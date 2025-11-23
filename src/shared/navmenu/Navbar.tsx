@@ -1,5 +1,5 @@
 import appState from "../appState"
-import StatusAndLogOut from "../../auth/StatusAndLogout"
+import Auth from "../../auth/auth"
 
 function Navbar(){
     console.log(appState)
@@ -14,13 +14,7 @@ function Navbar(){
                         <li id="groups" className="nav-item"><a className="nav-link" href="/groups">Esamos grupės</a></li>
                     </ul>
                 </div>
-                {!appState.isLoggedIn.value && (
-                    <a className="btn btn-secondary me-5" href="/login">Prisijungti</a>
-                )}
-                {appState.isLoggedIn.value && (
-                    <StatusAndLogOut />
-                )}
-                
+                <Auth />
             </nav>
         </header>
     )
