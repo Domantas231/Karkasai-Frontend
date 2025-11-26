@@ -127,18 +127,18 @@ function PostCard({
                     {isAuthor && !isEditingPost && (
                         <div className="btn-group">
                             <button 
-                                className="btn btn-sm btn-outline-secondary"
+                                className="btn btn-sm btn-outline-primary"
                                 onClick={() => setIsEditingPost(true)}
                                 title="Redaguoti įrašą"
                             >
-                                ✏️ Redaguoti
+                                Redaguoti
                             </button>
                             <button 
                                 className="btn btn-sm btn-outline-danger"
                                 onClick={handlePostDelete}
                                 title="Ištrinti įrašą"
                             >
-                                🗑️ Ištrinti
+                                Ištrinti
                             </button>
                         </div>
                     )}
@@ -155,13 +155,13 @@ function PostCard({
                         />
                         <div className="d-flex gap-2">
                             <button 
-                                className="btn btn-primary"
+                                className="btn btn-success"
                                 onClick={handlePostEditSubmit}
                             >
                                 Išsaugoti
                             </button>
                             <button 
-                                className="btn btn-secondary"
+                                className="btn btn-danger"
                                 onClick={handlePostEditCancel}
                             >
                                 Atšaukti
@@ -209,7 +209,7 @@ function PostCard({
                         {/* Comments List */}
                         <div>
                             {post.comments?.length > 0 ? (
-                                post.comments.map(c => (
+                                post.comments.toReversed().map(c => (
                                     <CommentComponent 
                                         key={c.id} 
                                         comment={c}

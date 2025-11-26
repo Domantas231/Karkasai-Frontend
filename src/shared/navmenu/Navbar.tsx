@@ -11,7 +11,10 @@ function Navbar(){
                 <div className="container-fluid justify-content-center">
                     <ul className="navbar-nav">
                         {appState.userTitle !== "" && (
-                            <li id="newGroup" className="nav-item"><a className="nav-link" href="/new-group">Sukurti naują grupę</a></li>
+                            <>
+                                <li id="newGroup" className="nav-item"><a className="nav-link" href="/new-group">Sukurti naują grupę</a></li>
+                                <li id="tags" className="nav-item"><a className="nav-link" href="/tags">Žymos</a></li>
+                            </>
                         )}
                         
                         <li id="groups" className="nav-item"><a className="nav-link" href="/groups">Esamos grupės</a></li>

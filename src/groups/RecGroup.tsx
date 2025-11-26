@@ -27,7 +27,7 @@ function RecGroup({groupName, currMem, maxMem, desc, tags, imageUrl} : RecGroupP
                         style={{
                             height: '220px',
                             objectFit: 'cover',
-                            transition: 'transform 0.4s ease'
+                            //transition: 'transform 0.4s ease'
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                         onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
@@ -90,16 +90,16 @@ function RecGroup({groupName, currMem, maxMem, desc, tags, imageUrl} : RecGroupP
                                     fontSize: '0.8rem',
                                     fontWeight: '600',
                                     textTransform: 'capitalize',
-                                    boxShadow: '0 2px 5px rgba(102, 126, 234, 0.3)',
+                                   // boxShadow: '0 2px 5px rgba(102, 126, 234, 0.3)',
                                     transition: 'all 0.3s ease'
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-2px)';
-                                    e.currentTarget.style.boxShadow = '0 4px 10px rgba(102, 126, 234, 0.5)';
+                                   // e.currentTarget.style.transform = 'translateY(-2px)';
+                                   // e.currentTarget.style.boxShadow = '0 4px 10px rgba(102, 126, 234, 0.5)';
                                 }}
                                 onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 2px 5px rgba(102, 126, 234, 0.3)';
+                                    //e.currentTarget.style.transform = 'translateY(0)';
+                                   // e.currentTarget.style.boxShadow = '0 2px 5px rgba(102, 126, 234, 0.3)';
                                 }}
                             >
                                 {t.name}
@@ -118,19 +118,16 @@ function RecGroup({groupName, currMem, maxMem, desc, tags, imageUrl} : RecGroupP
                             borderRadius: '10px',
                             fontSize: '1rem',
                             transition: 'all 0.3s ease',
-                            boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
                         }}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
                         }}
                         onMouseLeave={(e) => {
                             e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
                         }}
                         disabled={currMem >= maxMem}
                     >
-                        {currMem >= maxMem ? 'Grupė pilna' : 'Prisijungti dabar'}
+                        {currMem >= maxMem ? 'Grupė pilna' : 'Prisijungti!'}
                     </button>
                     )}
                 </div>

@@ -34,7 +34,7 @@ function AllGroups(){
         <div className="container">
             <div className="row text-center py-4" style={{"textShadow": "2px 2px 4px black"}}>
                 <div className="col-4">
-                    <h4>Visos grupÄ—s</h4>
+                    <h4>Visos grupės</h4>
                 </div>
                 <SearchHelper searchInput={searchInput} setSearchInput={setSearchInput} handleOnClick={() => {setFilter(searchInput)}}/>
             </div>

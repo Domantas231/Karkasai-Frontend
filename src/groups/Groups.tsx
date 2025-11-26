@@ -5,7 +5,7 @@ import RecGroupList from "./RecGroupList"
 function Groups () {
     return (
         <>
-            <HeaderImage title='Peržiūrėk esamas grupes!' subtitle='Ar žinojai, kad ...' imgHeight="400px"/>
+            <HeaderImage title='Peržiūrėk esamas grupes!' subtitle='Surask bendraminčių ir statykit įpročius kartu!' imgHeight="400px"/>
             <RecGroupList />
             <AllGroups />
         </>

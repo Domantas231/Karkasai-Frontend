@@ -27,7 +27,7 @@ function GroupInline({id = 1, title, currentMembers, maxMembers, description, ta
 
         try {
             await backend.put(`${config.backendUrl}groups/${id}/join`)
-            navigate(`group/${id}`)
+            navigate(`/group/${id}`)
         }
         catch(error){
             console.log(error)
@@ -48,34 +48,36 @@ function GroupInline({id = 1, title, currentMembers, maxMembers, description, ta
                 <div>
                     {tags.map(t => <Tag name={t.name} />)}
                 </div>
-                <span className="badge text-bg-primary rounded-pill">{currentMembers} / {maxMembers}</span>
-                {/* Join button */}
-                { appState.userTitle !== "" && (
-                    <button 
-                        className="btn btn-primary fw-bold"
-                        onClick={handleJoin}
-                        style={{
-                            background: 'green',
-                            border: 'none',
-                            padding: '0.75rem',
-                            borderRadius: '10px',
-                            fontSize: '1rem',
-                            transition: 'all 0.3s ease',
-                            boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
-                        }}
-                        disabled={currentMembers >= maxMembers}
-                    >
-                        {currentMembers >= maxMembers ? 'Grupė pilna' : 'Prisijungti'}
-                    </button>
-                )}
+                <div>
+                    <span className="badge text-bg-primary rounded-pill mx-4">{currentMembers} / {maxMembers}</span>
+                    {/* Join button */}
+                    { appState.userTitle !== "" && (
+                        <button 
+                            className="btn btn-primary fw-bold"
+                            onClick={handleJoin}
+                            style={{
+                                background: 'green',
+                                border: 'none',
+                                padding: '0.75rem',
+                                borderRadius: '10px',
+                                fontSize: '1rem',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                            }}
+                            disabled={currentMembers >= maxMembers}
+                        >
+                            {currentMembers >= maxMembers ? 'Grupė pilna' : 'Prisijungti'}
+                        </button>
+                    )}
+                </div>
             </div>
         </a>
     )

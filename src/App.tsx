@@ -13,6 +13,7 @@ import NewGroup from './newGroup/newGroup';
 import Login from './auth/login';
 import Register from './auth/register';
 import GroupDetail from './groupDetail/GroupDetail';
+import TagManagement from './tags/tagManagement'; 
 
 import appState from './shared/appState';
 import { setAuthenticatingBackend } from './shared/backend';
@@ -82,11 +83,13 @@ function App() {
     <Router>
       <Navbar />
       <main className="flex-shrink-0">
+		<Toast ref={toastRef}/>
         <Routes>
           <Route path="/" element={<About />}/>
           <Route path="/groups" element={<Groups />}/>
           <Route path="/group/:id" element={<GroupDetail />}/>
           <Route path="/new-group" element={<NewGroup />}/>
+          <Route path="/tags" element={<TagManagement />}/>
           <Route path="/login" element={<Login />}/>
           <Route path="/register" element={<Register />}/>
         </Routes>

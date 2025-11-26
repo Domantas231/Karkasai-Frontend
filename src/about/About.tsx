@@ -46,7 +46,7 @@ function About() {
                     <div className="col-md-4">
                         <div 
                             className="card h-100 border-0 shadow-sm"
-                            style={{borderRadius: '16px', transition: 'transform 0.3s ease'}}
+                            style={{borderRadius: '16px', transition: 'transform 0.3s ease', backgroundColor: "#4E5B69"}}
                             onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-10px)'}
                             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                         >
@@ -74,7 +74,7 @@ function About() {
                     <div className="col-md-4">
                         <div 
                             className="card h-100 border-0 shadow-sm"
-                            style={{borderRadius: '16px', transition: 'transform 0.3s ease'}}
+                            style={{borderRadius: '16px', transition: 'transform 0.3s ease', backgroundColor: "#4E5B69"}}
                             onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-10px)'}
                             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                         >
@@ -102,7 +102,7 @@ function About() {
                     <div className="col-md-4">
                         <div 
                             className="card h-100 border-0 shadow-sm"
-                            style={{borderRadius: '16px', transition: 'transform 0.3s ease'}}
+                            style={{borderRadius: '16px', transition: 'transform 0.3s ease', backgroundColor: "#4E5B69"}}
                             onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-10px)'}
                             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                         >

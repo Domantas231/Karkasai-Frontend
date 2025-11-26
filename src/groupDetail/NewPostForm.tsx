@@ -2,6 +2,8 @@ import { useState } from 'react';
 import backend from '../shared/backend';
 import config from '../shared/config';
 
+import { notifySuccess, notifyFailure } from '../shared/notify';
+
 interface NewPostFormProps {
     groupId: number,
     onPostCreated?: () => void
@@ -9,7 +11,6 @@ interface NewPostFormProps {
 
 function NewPostForm({ groupId, onPostCreated }: NewPostFormProps) {
     const [content, setContent] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -17,8 +18,6 @@ function NewPostForm({ groupId, onPostCreated }: NewPostFormProps) {
         if (!content.trim()) {
             return;
         }
-
-        setIsSubmitting(true);
         
         try {
             await backend.post(`${config.backendUrl}groups/${groupId}/posts`, {title: content});
@@ -29,8 +28,6 @@ function NewPostForm({ groupId, onPostCreated }: NewPostFormProps) {
             }
         } catch (error) {
             console.error('Error creating post:', error);
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -46,7 +43,6 @@ function NewPostForm({ groupId, onPostCreated }: NewPostFormProps) {
                             placeholder="Pasidalinkite savo mintimis su grupe..."
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
-                            disabled={isSubmitting}
                             required
                         ></textarea>
                     </div>
@@ -54,9 +50,8 @@ function NewPostForm({ groupId, onPostCreated }: NewPostFormProps) {
                         <button 
                             type="submit" 
                             className="btn btn-primary"
-                            disabled={isSubmitting || !content.trim()}
                         >
-                            {isSubmitting ? 'Siunčiama...' : 'Paskelbti'}
+                            Paskelbti
                         </button>
                     </div>
                 </form>

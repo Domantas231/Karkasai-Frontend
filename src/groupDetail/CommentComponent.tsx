@@ -64,18 +64,18 @@ function CommentComponent({ comment, currentUserId, onDelete, onEdit }: CommentP
                             {isAuthor && !isEditing && (
                                 <div className="btn-group btn-group-sm">
                                     <button 
-                                        className="btn btn-outline-secondary"
+                                        className="btn btn-outline-primary"
                                         onClick={() => setIsEditing(true)}
                                         title="Redaguoti"
                                     >
-                                        <i className="bi bi-pencil"></i> ✏️
+                                        <i className="bi bi-pencil"></i> Redaguoti
                                     </button>
                                     <button 
                                         className="btn btn-outline-danger"
                                         onClick={handleDelete}
                                         title="Ištrinti"
                                     >
-                                        <i className="bi bi-trash"></i> 🗑️
+                                        <i className="bi bi-trash"></i> Ištrinti
                                     </button>
                                 </div>
                             )}
@@ -92,13 +92,13 @@ function CommentComponent({ comment, currentUserId, onDelete, onEdit }: CommentP
                             />
                             <div className="d-flex gap-2">
                                 <button 
-                                    className="btn btn-sm btn-primary"
+                                    className="btn btn-sm btn-success"
                                     onClick={handleEditSubmit}
                                 >
                                     Išsaugoti
                                 </button>
                                 <button 
-                                    className="btn btn-sm btn-secondary"
+                                    className="btn btn-sm btn-danger"
                                     onClick={handleEditCancel}
                                 >
                                     Atšaukti

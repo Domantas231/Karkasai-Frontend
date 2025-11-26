@@ -9,7 +9,7 @@ function notifySuccess(msg : string) {
         severity : "success",
         summary : "Operation success.",
         detail : msg,
-        life : 5000
+        life : 3000
     })
 }
 
@@ -22,7 +22,7 @@ function notifyFailure(msg: string) {
         severity : "warn",
         summary : "Operation failure.",
         detail : msg,
-        sticky : true
+        life : 3000
     })
 }
 

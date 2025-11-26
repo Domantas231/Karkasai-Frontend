@@ -4,20 +4,25 @@ import HeaderImage from '../shared/headerimage/headerImage';
 import PostCard from './PostCard';
 import NewPostForm from './NewPostForm';
 import Tag from '../groups/Tag';
-import { GroupDetail as GroupDetailType, GroupEditDetail, Post, Comment } from '../shared/models';
+import { GroupDetail as GroupDetailType, GroupEditDetail, Post, Comment, TagOption, TagModel } from '../shared/models';
 import config from '../shared/config';
 import backend from '../shared/backend';
 
+import { notifySuccess, notifyFailure } from '../shared/notify';
+
 import appState from '../shared/appState';
+import Select, { InputActionMeta, MultiValue, StylesConfig } from 'react-select';
 
 function GroupDetail() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [group, setGroup] = useState<GroupDetailType | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
-    const [loading, setLoading] = useState(true);
     const [isGroupOwner, setIsGroupOwner] = useState(true);
     
+    const [selectedTags, setSelectedTags] = useState<TagOption[]>([])
+    const [tags, setTags] = useState<TagModel[]>()
+
     // Edit group state
     const [isEditingGroup, setIsEditingGroup] = useState(false);
     const [editedGroup, setEditedGroup] = useState<GroupEditDetail>({
@@ -29,7 +34,20 @@ function GroupDetail() {
 
     useEffect(() => {
         fetchGroupData();
+        fetchTagData();
     }, [id]);
+
+    const fetchTagData = async () => {
+        try {
+            console.log(config.backendUrl + 'group')
+            const response = await backend.get<TagModel[]>(config.backendUrl + 'tags')
+            setTags(response.data)
+            console.log(response.data)
+            }
+        catch (error) {
+            console.log('Failed to fetch data');
+        }
+    }
 
     const fetchGroupData = async () => {
         try {
@@ -55,8 +73,6 @@ function GroupDetail() {
             });
         } catch (error) {
             console.error('Error fetching group data:', error);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -68,35 +84,36 @@ function GroupDetail() {
 
     const handleDeletePost = async (postId: number) => {
         try {
-            // TODO: Send delete request to backend
             await backend.delete(`${config.backendUrl}groups/${id}/posts/${postId}`);
             
             console.log('Deleting post:', postId);
             setPosts(posts.filter(post => post.id !== postId));
+
+            notifySuccess('Sėkmingai ištrintas įrašas')
         } catch (error) {
             console.error('Error deleting post:', error);
-            alert('Nepavyko ištrinti įrašo');
+            notifyFailure('Nepavyko ištrinti įrašo');
         }
     };
 
     const handleEditPost = async (postId: number, newTitle: string) => {
         try {
-            // TODO: Send update request to backend
             await backend.put(`${config.backendUrl}groups/${id}/posts/${postId}`, { title: newTitle });
             
             console.log('Editing post:', postId, newTitle);
             setPosts(posts.map(post => 
                 post.id === postId ? { ...post, title: newTitle } : post
             ));
+
+            notifySuccess('Sėkmingai paredaguotas įrašas')
         } catch (error) {
             console.error('Error editing post:', error);
-            alert('Nepavyko redaguoti įrašo');
+            notifyFailure('Nepavyko redaguoti įrašo');
         }
     };
 
     const handleDeleteComment = async (postId: number, commentId: number) => {
         try {
-            // TODO: Send delete request to backend
             await backend.delete(`${config.backendUrl}groups/${id}/posts/${postId}/comments/${commentId}`);
             
             console.log('Deleting comment:', commentId, 'from post:', postId);
@@ -105,15 +122,16 @@ function GroupDetail() {
                     ? { ...post, comments: post.comments.filter(comment => comment.id !== commentId) }
                     : post
             ));
+
+            notifySuccess('Sėkmingai ištrintas komentaras')
         } catch (error) {
             console.error('Error deleting comment:', error);
-            alert('Nepavyko ištrinti komentaro');
+            notifyFailure('Nepavyko ištrinti komentaro');
         }
     };
 
     const handleEditComment = async (postId: number, commentId: number, newContent: string) => {
         try {
-            // TODO: Send update request to backend
             await backend.put(`${config.backendUrl}groups/${id}/posts/${postId}/comments/${commentId}`, { content: newContent });
             
             console.log('Editing comment:', commentId, 'from post:', postId, newContent);
@@ -127,20 +145,24 @@ function GroupDetail() {
                     }
                     : post
             ));
+
+            notifySuccess('Sėkmingai paredaguotas komentaras')
         } catch (error) {
             console.error('Error editing comment:', error);
-            alert('Nepavyko redaguoti komentaro');
+            notifyFailure('Nepavyko redaguoti komentaro');
         }
     };
 
     const handleDeleteGroup = async () => {
-        if (window.confirm('Ar tikrai norite ištrinti šią grupę? Šis veiksmas negrįžtamas.')) {
+        if (window.confirm('Ar tikrai norite ištrinti šią grupę?')) {
             try {
                 await backend.delete(`${config.backendUrl}groups/${id}`);
+
+                notifySuccess('Grupė sėkmingai ištrinta')
                 navigate('/groups');
             } catch (error) {
                 console.error('Error deleting group:', error);
-                alert('Nepavyko ištrinti grupės');
+                notifyFailure('Nepavyko ištrinti grupės');
             }
         }
     };
@@ -165,22 +187,31 @@ function GroupDetail() {
             maxMembers: group?.maxMembers || 0,
             tagIds: group?.tags.map(t => t.id) || []
         });
+
+        setIsEditingGroup(false);
     };
 
     const handleEditGroupSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
+        setEditedGroup({
+            ...editedGroup,
+            tagIds: selectedTags.map(t => Number(t.value))
+        })
+
+        console.log(editedGroup)
+
         // Validation
         if (!editedGroup.title.trim()) {
-            alert('Pavadinimas negali būti tuščias');
+            notifyFailure('Pavadinimas negali būti tuščias');
             return;
         }
         if (!editedGroup.description.trim()) {
-            alert('Aprašymas negali būti tuščias');
+            notifyFailure('Aprašymas negali būti tuščias');
             return;
         }
         if (editedGroup.maxMembers < (group?.currentMembers || 0)) {
-            alert(`Narių skaičius negali būti mažesnis už dabartinį narių skaičių (${group?.currentMembers})`);
+            notifyFailure(`Narių skaičius negali būti mažesnis už dabartinį narių skaičių (${group?.currentMembers})`);
             return;
         }
 
@@ -195,27 +226,21 @@ function GroupDetail() {
                     ...group,
                     title: editedGroup.title,
                     description: editedGroup.description,
-                    maxMembers: editedGroup.maxMembers
+                    maxMembers: editedGroup.maxMembers,
+                    tags: editedGroup.tagIds.map(t => ({
+                        id: t, 
+                        name: tags?.filter(ti => ti.id === t)[0].name
+                    } as TagModel))
                 });
             }
             
             setIsEditingGroup(false);
-            alert('Grupės informacija atnaujinta sėkmingai');
+            notifySuccess('Grupės informacija atnaujinta sėkmingai')
         } catch (error) {
             console.error('Error updating group:', error);
-            alert('Nepavyko atnaujinti grupės informacijos');
+            notifyFailure('Nepavyko atnaujinti grupės informacijos')
         }
     };
-
-    if (loading) {
-        return (
-            <div className="container py-5 text-center">
-                <div className="spinner-border" role="status">
-                    <span className="visually-hidden">Kraunama...</span>
-                </div>
-            </div>
-        );
-    }
 
     if (!group) {
         return (
@@ -225,6 +250,61 @@ function GroupDetail() {
             </div>
         );
     }
+
+    const customStyles: StylesConfig<TagOption> = {
+            control: (provided, state) => ({
+                ...provided,
+                backgroundColor: '#212529',
+                borderColor: state.isFocused ? '#4299e1' : '#4a5759',
+                color: 'white',
+                '&:hover': {
+                    borderColor: '#4299e1'
+                },
+                minHeight: '45px'
+            }),
+            menu: (provided) => ({
+                ...provided,
+                backgroundColor: '#212529',
+            }),
+            option: (provided, state) => ({
+                ...provided,
+                backgroundColor: state.isSelected ? '#4299e1' : state.isFocused ? '#4a5759' : '#212529',
+                color: 'white',
+                '&:hover': {
+                    backgroundColor: '#4a5759'
+                }
+            }),
+            multiValue: (provided) => ({
+                ...provided,
+                backgroundColor: '#4a5759',
+            }),
+            multiValueLabel: (provided) => ({
+                ...provided,
+                color: 'white',
+            }),
+            multiValueRemove: (provided) => ({
+                ...provided,
+                color: 'white',
+                '&:hover': {
+                    backgroundColor: '#e53e3e',
+                    color: 'white',
+                }
+            }),
+            input: (provided) => ({
+                ...provided,
+                color: 'white',
+            }),
+            placeholder: (provided) => ({
+                ...provided,
+                color: '#a0aec0',
+            }),
+            singleValue: (provided) => ({
+                ...provided,
+                color: 'white',
+            })
+        }
+
+    const options = tags?.map(t => ({value: t.id, label: t.name}))
 
     return (
         <>
@@ -300,37 +380,46 @@ function GroupDetail() {
                                                 </small>
                                             </div>
 
-                                            {/* <div className="col-md-6">
-                                                <label htmlFor="groupTags" className="form-label">
-                                                    Žymos (atskirtos kableliais)
+                                            <div className="mb-3 my-3">
+                                                <label className="form-label fw-semibold">
+                                                    Žymos
                                                 </label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    id="groupTags"
-                                                    value={editedGroup.tags}
-                                                    onChange={(e) => setEditedGroup({
+                                                <Select<TagOption, true>
+                                                    options={options}
+                                                    value={editedGroup.tagIds.map(t => ({
+                                                        value: t, 
+                                                        label: tags?.filter(ti => ti.id === t)[0].name
+                                                    } as TagOption))}
+                                                    onChange={(selected : MultiValue<TagOption>) => setEditedGroup({
                                                         ...editedGroup,
-                                                        tags: e.target.value
+                                                        tagIds: selected ? selected.map(s => Number(s.value)) : []
                                                     })}
-                                                    placeholder="pvz: naujokams, pažengusiems"
+                                                    classNamePrefix="select"
+                                                    className="basic-multi-select"
+                                                    isMulti
+                                                    name="tags"
+                                                    styles={customStyles}
+                                                    placeholder="Pasirinkite žymas..."   
                                                 />
-                                            </div> */}
+                                                <div className="form-text">
+                                                    Pasirinkite žymas, kurios apibūdina jūsų grupę
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div className="d-flex gap-2 justify-content-end">
                                             <button 
+                                                type="submit"
+                                                className="btn btn-success"
+                                            >
+                                                Išsaugoti
+                                            </button>
+                                            <button 
                                                 type="button"
-                                                className="btn btn-secondary"
+                                                className="btn btn-danger"
                                                 onClick={handleEditGroupCancel}
                                             >
                                                 Atšaukti
-                                            </button>
-                                            <button 
-                                                type="submit"
-                                                className="btn btn-primary"
-                                            >
-                                                Išsaugoti pakeitimus
                                             </button>
                                         </div>
                                     </form>
@@ -344,22 +433,22 @@ function GroupDetail() {
                                                     {group.currentMembers} / {group.maxMembers} nariai
                                                 </span>
                                                 {isGroupOwner && (
-                                                    <>
+                                                    <div className="btn-group">
                                                         <button 
                                                             className="btn btn-sm btn-outline-primary"
                                                             onClick={handleEditGroupClick}
                                                             title="Redaguoti grupę"
                                                         >
-                                                            ✏️ Redaguoti
+                                                            Redaguoti
                                                         </button>
                                                         <button 
                                                             className="btn btn-sm btn-outline-danger"
                                                             onClick={handleDeleteGroup}
                                                             title="Ištrinti grupę"
                                                         >
-                                                            🗑️ Ištrinti
+                                                            Ištrinti
                                                         </button>
-                                                    </>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
@@ -387,7 +476,7 @@ function GroupDetail() {
                         <NewPostForm groupId={group.id} onPostCreated={fetchGroupData} />
                         
                         {posts.length > 0 ? (
-                            posts.map(post => (
+                            posts.toReversed().map(post => (
                                 <PostCard 
                                     groupId={Number(id)}
                                     key={post.id} 

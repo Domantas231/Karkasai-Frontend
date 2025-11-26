@@ -1,14 +1,20 @@
 import { useState, useEffect } from 'react'
 import Select, { StylesConfig } from 'react-select'
 
+import { useNavigate } from 'react-router-dom'
+
 import config from '../shared/config'
 import backend from "../shared/backend"
+
+import { notifySuccess, notifyFailure } from '../shared/notify'
 
 import { TagModel, TagOption } from "../shared/models";
 
 function NewGroupForm(){
     const [selectedTags, setSelectedTags] = useState<TagOption[]>([])
     const [tags, setTags] = useState<TagModel[]>()
+
+    const navigate = useNavigate()
 
     function handleFormSubmit(formData: FormData){
         const groupName = formData.get("groupName")
@@ -26,9 +32,14 @@ function NewGroupForm(){
 
         try {
             backend.post(config.backendUrl + 'groups', newGroup)
+
+            notifySuccess("Sėkmingai pridėta nauja grupė!")
+            navigate("../groups")
         }
         catch(err: any){
             console.error('Post error:', err);
+
+            notifyFailure("Nepavyko pridėti naujos grupės.")
         }
     }
 
@@ -123,7 +134,7 @@ function NewGroupForm(){
                                         
                                         <div className="mb-4">
                                             <label htmlFor="groupTitle" className="form-label fw-semibold">
-                                                Grupės pavadinimas <span className="text-danger">*</span>
+                                                Grupės pavadinimas
                                             </label>
                                             <input 
                                                 name="groupName" 
@@ -136,7 +147,7 @@ function NewGroupForm(){
 
                                         <div className="mb-3">
                                             <label htmlFor="groupDescription" className="form-label fw-semibold">
-                                                Aprašymas <span className="text-danger">*</span>
+                                                Aprašymas
                                             </label>
                                             <textarea 
                                                 className="form-control shadow-sm" 
@@ -163,7 +174,7 @@ function NewGroupForm(){
                                         {/* Max Members */}
                                         <div className="mb-4">
                                             <label htmlFor="maxMembers" className="form-label fw-semibold">
-                                                Maksimalus narių skaičius <span className="text-danger">*</span>
+                                                Maksimalus narių skaičius
                                             </label>
                                             <input 
                                                 type="number" 
@@ -183,7 +194,7 @@ function NewGroupForm(){
                                         {/* Access Control */}
                                         <div className="mb-4">
                                             <label className="form-label fw-semibold d-block mb-3">
-                                                Prisijungimo būdas <span className="text-danger">*</span>
+                                                Prisijungimo būdas
                                             </label>
                                             <div className="form-check mb-2">
                                                 <input 

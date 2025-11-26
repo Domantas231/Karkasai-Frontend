@@ -65,7 +65,7 @@ interface TagModel {
 }
 
 interface TagOption {
-    value: string,
+    value: number,
     label: string;
 }
 
