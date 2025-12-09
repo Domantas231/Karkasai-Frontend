@@ -159,7 +159,6 @@ function TagManagement() {
             <div className="container py-5">
                 <div className="row justify-content-center">
                     <div className="col-lg-8">
-                        {/* Add New Tag Form */}
                         <div className="card shadow mb-4">
                             <div className="card-body">
                                 <h4 className="card-title mb-4 text-center">Pridėti naują žymą</h4>

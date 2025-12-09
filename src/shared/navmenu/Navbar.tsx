@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import appState from "../appState"
 import Auth from "../../auth/auth"
-import './Navbar.css'
+import './navbar.css'
 
 function Navbar(){
     const [isMenuOpen, setIsMenuOpen] = useState(false);
