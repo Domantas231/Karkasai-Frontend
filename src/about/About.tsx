@@ -1,6 +1,6 @@
 import HeaderImage from '../shared/headerimage/headerImage';
-import './about.css'
-import CarouselAbout from './carousel';
+import './About.css'
+import CarouselAbout from './Carousel';
 
 import appState from '../shared/appState';
 

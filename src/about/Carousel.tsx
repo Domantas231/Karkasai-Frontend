@@ -1,5 +1,5 @@
 import Carousel from 'react-bootstrap/carousel'
-import CarouselItemAbout from "./carouselItem"
+import CarouselItemAbout from "./CarouselItem"
 
 function CarouselAbout() {
     return (
