@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
 import { Navbar } from './shared/navmenu/Navbar';
 import { Footer } from './shared/footer/Footer';
-import Modal from './shared/modal/Modal';
+import Modal from './shared/modal/modal';
 
 import About from './about/About';
 import Groups from './groups/Groups';
