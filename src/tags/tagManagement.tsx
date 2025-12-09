@@ -6,6 +6,7 @@ import config from '../shared/config';
 interface Tag {
     id: number;
     name: string;
+    usable: boolean;
 }
 
 function TagManagement() {
@@ -19,6 +20,8 @@ function TagManagement() {
     // Edit state
     const [editingTagId, setEditingTagId] = useState<number | null>(null);
     const [editingTagName, setEditingTagName] = useState('');
+    const [editingTagUsability, setEditingTagUsability] = useState(true);
+
     const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
@@ -29,6 +32,9 @@ function TagManagement() {
         try {
             setError('');
             const response = await backend.get<Tag[]>(config.backendUrl + 'tags');
+
+            console.log('tags', response.data)
+
             setTags(response.data);
         } catch (err: any) {
             console.error('Error fetching tags:', err);
@@ -80,6 +86,10 @@ function TagManagement() {
         setEditingTagName('');
         setError('');
     };
+    
+    const handleToggleUsability = () => {
+        setEditingTagUsability(!editingTagUsability)
+    };
 
     const handleUpdateTag = async (tagId: number) => {
         if (!editingTagName.trim()) {
@@ -96,13 +106,19 @@ function TagManagement() {
         setError('');
 
         try {
+            let newTag = {
+                id: tagId,
+                name: editingTagName.trim(),
+                usable: editingTagUsability
+            }
+
+            console.log(newTag)
+
             const response = await backend.put<Tag>(
-                `${config.backendUrl}tags/${tagId}`,
-                {
-                    id: tagId,
-                    name: editingTagName.trim()
-                }
+                `${config.backendUrl}tags/${tagId}`, newTag                
             );
+
+            console.log(response.data)
 
             setTags(tags.map(tag => 
                 tag.id === tagId ? response.data : tag
@@ -143,19 +159,6 @@ function TagManagement() {
             <div className="container py-5">
                 <div className="row justify-content-center">
                     <div className="col-lg-8">
-                        {/* Error Alert */}
-                        {error && (
-                            <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                                {error}
-                                <button 
-                                    type="button" 
-                                    className="btn-close" 
-                                    onClick={() => setError('')}
-                                    aria-label="Close"
-                                ></button>
-                            </div>
-                        )}
-
                         {/* Add New Tag Form */}
                         <div className="card shadow mb-4">
                             <div className="card-body">
@@ -254,14 +257,32 @@ function TagManagement() {
                                                         >
                                                             ✕
                                                         </button>
+                                                        <button
+                                                            
+                                                            className={ editingTagUsability ? 
+                                                                'btn btn-success btn-sm'
+                                                             :
+                                                                'btn btn-danger btn-sm'
+                                                            }
+                                                            onClick={handleToggleUsability}
+                                                            disabled={isUpdating}
+                                                            title="Usability"
+                                                        >
+                                                            Usable
+                                                        </button>
                                                     </div>
                                                 ) : (
                                                     /* View Mode */
                                                     <div className="d-flex justify-content-between align-items-center">
                                                         <div>
-                                                            <span className="badge bg-primary rounded-pill fs-6 px-3 py-2">
+                                                            {tag.usable ? 
+                                                            (<span className="badge bg-primary rounded-pill fs-6 px-3 py-2">
                                                                 {tag.name}
-                                                            </span>
+                                                            </span>) :
+                                                            (<span className="badge bg-secondary rounded-pill fs-6 px-3 py-2">
+                                                                {tag.name}
+                                                            </span>)}
+
                                                         </div>
                                                         <div className="btn-group">
                                                             <button

@@ -251,7 +251,6 @@ function NewGroupForm(){
                                 {/* Submit Button */}
                                 <div className="d-grid">
                                     <button type="submit" className="btn btn-primary btn-lg shadow">
-                                        <i className="bi bi-check-circle me-2"></i>
                                         Sukurti grupę
                                     </button>
                                 </div>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import HeaderImage from '../shared/headerimage/headerImage';
 import backend from '../shared/backend';
 import config from '../shared/config';
+import { notifyFailure, notifySuccess } from '../shared/notify';
 
 function Register() {
     const [formData, setFormData] = useState({
@@ -12,7 +13,6 @@ function Register() {
         username: ''
     });
     const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,17 +28,15 @@ function Register() {
 
         // Validate passwords match
         if (formData.password !== formData.confirmPassword) {
-            setError('Slaptažodžiai nesutampa');
+            notifyFailure('Slaptažodžiai nesutampa')
             return;
         }
 
         // Validate password length
         if (formData.password.length < 6) {
-            setError('Slaptažodis turi būti bent 6 simbolių ilgio');
+            notifyFailure('Slaptažodis turi būti bent 6 simbolių ilgio')
             return;
         }
-
-        setIsLoading(true);
 
         try {
             await backend.post(config.backendUrl + 'accounts', {
@@ -48,14 +46,11 @@ function Register() {
             });
 
             // Redirect to login page after successful registration
-            navigate('/login', { 
-                state: { message: 'Registracija sėkminga! Prašome prisijungti.' }
-            });
+            notifySuccess('Registracija sėkminga! Prašome prisijungti')
+            navigate('/login');
         } catch (err: any) {
             console.error('Registration error:', err);
-            setError(err.response?.data?.message || 'Nepavyko užsiregistruoti. Bandykite dar kartą.');
-        } finally {
-            setIsLoading(false);
+            err.response?.data?.map((p :{ description: string }) => notifyFailure(p.description))
         }
     };
 
@@ -93,7 +88,6 @@ function Register() {
                                             value={formData.username}
                                             onChange={handleChange}
                                             required
-                                            disabled={isLoading}
                                         />
                                     </div>
 
@@ -109,7 +103,6 @@ function Register() {
                                             value={formData.email}
                                             onChange={handleChange}
                                             required
-                                            disabled={isLoading}
                                         />
                                     </div>
 
@@ -125,7 +118,6 @@ function Register() {
                                             value={formData.password}
                                             onChange={handleChange}
                                             required
-                                            disabled={isLoading}
                                             minLength={6}
                                         />
                                         <small className="text-muted">
@@ -145,7 +137,6 @@ function Register() {
                                             value={formData.confirmPassword}
                                             onChange={handleChange}
                                             required
-                                            disabled={isLoading}
                                         />
                                     </div>
 
@@ -153,9 +144,8 @@ function Register() {
                                         <button 
                                             type="submit" 
                                             className="btn btn-primary"
-                                            disabled={isLoading}
                                         >
-                                            {isLoading ? 'Registruojamasi...' : 'Registruotis'}
+                                            Registruotis
                                         </button>
                                     </div>
 

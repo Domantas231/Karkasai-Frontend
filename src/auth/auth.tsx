@@ -3,7 +3,7 @@ import { useState } from 'react';
 import appState from '../shared/appState';
 
 import StatusAndLogOut from './StatusAndLogout';
-
+import './auth.css';
 
 class State {
 	isInitialized : boolean = false;
@@ -49,14 +49,16 @@ function Auth() {
 
 	//render component html
 	let html = 
-		<>
+		<div className="auth-container">
 		{ !appState.isLoggedIn.value &&
-			<a className="btn btn-secondary me-5" href="/login">Prisijungti</a>
+			<a className="btn btn-login" href="/login">
+				Prisijungti
+			</a>
 		}
 		{ appState.isLoggedIn.value &&
 			<StatusAndLogOut/>
 		}
-		</>;
+		</div>;
 
 	//
 	return html;

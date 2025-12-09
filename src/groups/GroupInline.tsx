@@ -36,21 +36,22 @@ function GroupInline({id = 1, title, currentMembers, maxMembers, description, ta
 
     return (
         <a href={`/group/${id}`} className="list-group-item list-group-item-action">
-            <div className="d-flex w-100 justify-content-between align-items-center">
-                <div className="d-flex align-items-center">
-                    <img src={imageUrl} className="rounded shadow me-3"/>
-                    <div>
-                        <h5 className="mb-1">{title}</h5>
-                        <p className="mb-1">{description}</p>
+            <div className="d-flex flex-column flex-md-row w-100 justify-content-between align-items-start align-items-md-center gap-2">
+                <div className="d-flex align-items-center min-width-0 flex-grow-1 flex-shrink-1" style={{ minWidth: 0 }}>
+                    <img src={imageUrl} className="rounded shadow me-3 flex-shrink-0" style={{ width: '50px', height: '50px', objectFit: 'cover' }}/>
+                    <div style={{ minWidth: 0 }}>
+                        <h5 className="mb-1 text-truncate">{title}</h5>
+                        <p className="mb-1 text-truncate text-muted" style={{ maxWidth: '300px' }}>{description}</p>
                     </div>
                 </div>
                 
-                <div>
-                    {tags.map(t => <Tag name={t.name} />)}
-                </div>
-                <div>
-                    <span className="badge text-bg-primary rounded-pill mx-4">{currentMembers} / {maxMembers}</span>
-                    {/* Join button */}
+                <div className="d-flex align-items-center flex-shrink-0 gap-2 flex-wrap">
+                    <div className="d-flex flex-wrap gap-1">
+                        {tags.map((t, index) => (
+                            t.usable && <Tag key={index} name={t.name} />
+                        ))}
+                    </div>
+                    <span className="badge text-bg-primary rounded-pill">{currentMembers} / {maxMembers}</span>
                     { appState.userTitle !== "" && (
                         <button 
                             className="btn btn-primary fw-bold"

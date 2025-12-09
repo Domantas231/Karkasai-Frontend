@@ -61,7 +61,8 @@ interface Comment {
 
 interface TagModel {
     id: number,
-    name: string
+    name: string,
+    usable: boolean
 }
 
 interface TagOption {

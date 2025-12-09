@@ -26,7 +26,6 @@ function StatusAndLogOut() {
 		//logout ok
 		.then(resp => {			
 			//forget user information and JWT
-			//appState.userId = "";
 			appState.userTitle = "";
 			appState.authJwt = null;
 
@@ -42,7 +41,6 @@ function StatusAndLogOut() {
 		.catch(err => {
 			console.error('Logout error:', err);
 			// Force logout on client even if backend fails
-			//appState.userId = "";
 			appState.userTitle = "";
 			appState.authJwt = null;
 			setNonAuthenticatingBackend();
@@ -52,18 +50,28 @@ function StatusAndLogOut() {
 		});
 	}
 
+	// Get initials for avatar
+	const getInitials = (name: string) => {
+		return name.charAt(0).toUpperCase();
+	}
+
 	//render component html
 	let html = 
-		<>
-		<span className="d-flex align-items-center">
-			<span>Welcome, {appState.userTitle}</span>
+		<div className="status-logout-container">
+			<div className="user-status">
+				<div className="user-avatar">
+					{getInitials(appState.userTitle)}
+				</div>
+				<span className="username d-none d-sm-inline">{appState.userTitle}</span>
+			</div>
 			<button 
 				type="button"
-				className="btn btn-primary btn-sm me-5" 
+				className="btn-logout" 
 				onClick={() => onLogOut()}
-				>Log out</button>
-		</span>
-		</>;
+			>
+				<span className="d-none d-sm-inline">Atsijungti</span>
+			</button>
+		</div>;
 
 	//
 	return html;

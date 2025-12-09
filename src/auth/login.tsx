@@ -5,18 +5,17 @@ import backend, { setAuthenticatingBackend } from '../shared/backend';
 import config from '../shared/config';
 
 import appState from '../shared/appState';
+import { notifyFailure, notifySuccess } from '../shared/notify';
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');
-        setIsLoading(true);
 
         console.log(JSON.stringify({
                 username,
@@ -43,12 +42,13 @@ function Login() {
             setAuthenticatingBackend(token);
             
             // Redirect to groups page
+
+            notifySuccess('Sėkmingai pavyko prisijungti')
+
             navigate('/groups');
         } catch (err: any) {
             console.error('Login error:', err);
-            setError(err.response?.data?.message || 'Nepavyko prisijungti. Patikrinkite savo duomenis.');
-        } finally {
-            setIsLoading(false);
+            notifyFailure('Nepavyko prisijungti')
         }
     };
 
@@ -85,7 +85,6 @@ function Login() {
                                             value={username}
                                             onChange={(e) => setUsername(e.target.value)}
                                             required
-                                            disabled={isLoading}
                                         />
                                     </div>
 
@@ -100,7 +99,6 @@ function Login() {
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             required
-                                            disabled={isLoading}
                                         />
                                     </div>
 
@@ -108,9 +106,8 @@ function Login() {
                                         <button 
                                             type="submit" 
                                             className="btn btn-primary"
-                                            disabled={isLoading}
                                         >
-                                            {isLoading ? 'Jungiamasi...' : 'Prisijungti'}
+                                            Prisijungti
                                         </button>
                                     </div>
 
