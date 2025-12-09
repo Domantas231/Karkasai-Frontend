@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import appState from '../shared/appState';
 
-import StatusAndLogOut from './StatusAndLogout';
+import StatusAndLogOut from './StatusAndLogOut';
 import './auth.css';
 
 class State {
