@@ -50,7 +50,7 @@ function CommentComponent({ comment, currentUserId, onDelete, onEdit }: CommentP
     return (
         <div className="d-flex mb-3 align-items-start">
             <img 
-                src='https://picsum.photos/40/40'
+                src={comment.imageUrl !== null ? comment.imageUrl : 'https://picsum.photos/40/40'}
                 className="rounded-circle me-3" 
                 style={{ width: '40px', height: '40px', objectFit: 'cover' }}
                 alt={comment.user.userName}

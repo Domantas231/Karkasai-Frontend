@@ -34,6 +34,8 @@ function GroupInline({id = 1, title, currentMembers, maxMembers, description, ta
         }
     }
 
+    console.log("group for l inside: ", imageUrl)
+
     return (
         <a href={`/group/${id}`} className="list-group-item list-group-item-action">
             <div className="d-flex flex-column flex-md-row w-100 justify-content-between align-items-start align-items-md-center gap-2">

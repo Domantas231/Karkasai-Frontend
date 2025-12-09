@@ -112,12 +112,6 @@ function PostCard({
                 {/* Post Header */}
                 <div className="d-flex align-items-center justify-content-between mb-3">
                     <div className="d-flex align-items-center">
-                        <img 
-                            src='https://picsum.photos/50/50'
-                            className="rounded-circle me-3" 
-                            style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                            alt={post.user.userName}
-                        />
                         <div>
                             <h5 className="mb-0">{post.user.userName}</h5>
                             <small className="text-muted">{formatDate(post.dateCreated)}</small>
@@ -176,7 +170,7 @@ function PostCard({
                         {(
                             <div className="mb-3">
                                 <img 
-                                    src='https://picsum.photos/50/50'
+                                    src={post.imageUrl !== null ? post.imageUrl : 'https://picsum.photos/50/50'}
                                     className="img-fluid rounded" 
                                     alt="Post attachment"
                                     style={{ maxHeight: '500px', objectFit: 'cover', width: '100%' }}

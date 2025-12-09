@@ -4,10 +4,11 @@ interface HeaderImageProps {
     title: string,
     subtitle: string,
     children?: React.ReactNode,
-    imgHeight?: string
+    imgHeight?: string,
+    image?: string
 }
 
-function HeaderImage({title, subtitle, children, imgHeight} : HeaderImageProps) {
+function HeaderImage({title, subtitle, children, imgHeight, image = "https://picsum.photos/4000/2000"} : HeaderImageProps) {
     return (
         <div className="container-fluid position-relative header-image-container p-0">
             <div className="header-overlay"></div>
@@ -22,7 +23,7 @@ function HeaderImage({title, subtitle, children, imgHeight} : HeaderImageProps) 
                 style={{height: imgHeight}} 
                 className="shadow" 
                 id="header-img" 
-                src="https://picsum.photos/4000/2000"
+                src={image}
                 alt={title}
                 loading="lazy"
             />

@@ -4,6 +4,7 @@ interface GroupForL {
     description: string,
     currentMembers: number,
     maxMembers: number,
+    imageUrl: string,
     tags: TagModel[]
 }
 
@@ -49,6 +50,7 @@ interface Post {
     title: string,
     user: User,
     dateCreated: string,
+    imageUrl: string,
     comments: Comment[]
 }
 
@@ -56,6 +58,7 @@ interface Comment {
     id: number,
     content: string,
     user: User,
+    imageUrl: string,
     dateCreated: string,
 }
 

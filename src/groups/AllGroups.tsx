@@ -20,7 +20,7 @@ function AllGroups(){
             try {
                 const response = await backend.get<GroupForL[]>(config.backendUrl + 'groups')
                 setGroups(response.data)
-                console.log(response.data)
+                console.log("group for l", response.data)
             }
             catch (error) {
                 console.log('Failed to fetch data');
@@ -50,7 +50,7 @@ function AllGroups(){
                         maxMembers={g.maxMembers}
                         description={g.description}
                         tags={g.tags}
-                        imageUrl='https://picsum.photos/50/50' 
+                        imageUrl={g.imageUrl !== null ? g.imageUrl : 'https://picsum.photos/50/50'}
                     />
                 )
                 :
@@ -63,7 +63,7 @@ function AllGroups(){
                         maxMembers={g.maxMembers}
                         description={g.description}
                         tags={g.tags}
-                        imageUrl='https://picsum.photos/50/50' 
+                        imageUrl={g.imageUrl !== null ? g.imageUrl : 'https://picsum.photos/50/50'}
                     />
                 )}
             </div>

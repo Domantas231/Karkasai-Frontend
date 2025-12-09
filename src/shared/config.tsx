@@ -3,8 +3,7 @@
  */
 class Config {
 	/** Backend URL. */
-	// backendUrl = "http://localhost:5000/api/";
-	backendUrl = "https://habittribeapi-app-oxhnx.ondigitalocean.app/api/"
+	backendUrl = "http://localhost:5000/api/";
 }
 
 //export default instance
