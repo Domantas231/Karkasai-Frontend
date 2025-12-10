@@ -174,7 +174,11 @@ class SignalRService {
 
             // Join each group's notification channel
             for (const group of groups) {
-                await this.joinGroup(group.id);
+                for(const user of group.members){
+                    if(user.userName === appState.userTitle){
+                        await this.joinGroup(group.id);
+                    }
+                }
             }
 
             console.log(`SignalR: Joined ${groups.length} group channels`);

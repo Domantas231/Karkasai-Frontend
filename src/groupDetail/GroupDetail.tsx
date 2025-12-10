@@ -371,7 +371,7 @@ function GroupDetail() {
                 title={group.title} 
                 subtitle={group.description}
                 imgHeight="400px"
-                image={group.imageUrl}
+                image={group.imageUrl !== null ? group.imageUrl : 'https://picsum.photos/4000/2000'}
             />
 
             <div className="container py-3">
