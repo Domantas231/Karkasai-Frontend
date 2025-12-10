@@ -199,7 +199,7 @@ function NewGroupForm(){
                                                 className="form-control shadow-sm" 
                                                 name="description" 
                                                 id="groupDescription"
-                                                rows={10}
+                                                rows={3}
                                                 placeholder="Aprašykite savo grupę, veiklas, susitikimų laiką ir vietą..."
                                                 required
                                             ></textarea>

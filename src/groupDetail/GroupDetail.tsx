@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import HeaderImage from '../shared/headerimage/headerImage';
 import PostCard from './PostCard';
@@ -11,7 +11,7 @@ import backend from '../shared/backend';
 import { notifySuccess, notifyFailure } from '../shared/notify';
 
 import appState from '../shared/appState';
-import Select, { InputActionMeta, MultiValue, StylesConfig } from 'react-select';
+import Select, { MultiValue, StylesConfig } from 'react-select';
 
 function GroupDetail() {
     const { id } = useParams<{ id: string }>();
@@ -31,6 +31,13 @@ function GroupDetail() {
         maxMembers: 0,
         tagIds: []
     });
+
+    // Group image editing state
+    const [selectedGroupImage, setSelectedGroupImage] = useState<File | null>(null);
+    const [groupImagePreview, setGroupImagePreview] = useState<string | null>(null);
+    const [isUploadingGroupImage, setIsUploadingGroupImage] = useState(false);
+    const [removeCurrentGroupImage, setRemoveCurrentGroupImage] = useState(false);
+    const groupImageInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         fetchGroupData();
@@ -167,6 +174,43 @@ function GroupDetail() {
         }
     };
 
+    // Group image handlers
+    const handleGroupImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                notifyFailure('Netinkamas failo tipas. Leidžiami: JPG, PNG, WebP');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                notifyFailure('Failas per didelis. Maksimalus dydis: 5MB');
+                return;
+            }
+            setSelectedGroupImage(file);
+            setGroupImagePreview(URL.createObjectURL(file));
+            setRemoveCurrentGroupImage(false);
+        }
+    };
+
+    const handleRemoveGroupImage = () => {
+        setSelectedGroupImage(null);
+        setGroupImagePreview(null);
+        setRemoveCurrentGroupImage(true);
+        if (groupImageInputRef.current) {
+            groupImageInputRef.current.value = '';
+        }
+    };
+
+    const handleCancelGroupImageChange = () => {
+        setSelectedGroupImage(null);
+        setGroupImagePreview(null);
+        setRemoveCurrentGroupImage(false);
+        if (groupImageInputRef.current) {
+            groupImageInputRef.current.value = '';
+        }
+    };
+
     const handleEditGroupClick = () => {
         console.log("Group", group)
 
@@ -176,6 +220,9 @@ function GroupDetail() {
             maxMembers: group?.maxMembers || 0,
             tagIds: group?.tags.map(t => t.id) || []
         });
+        setSelectedGroupImage(null);
+        setGroupImagePreview(null);
+        setRemoveCurrentGroupImage(false);
         setIsEditingGroup(true);
         console.log(group)
     };
@@ -187,7 +234,9 @@ function GroupDetail() {
             maxMembers: group?.maxMembers || 0,
             tagIds: group?.tags.map(t => t.id) || []
         });
-
+        setSelectedGroupImage(null);
+        setGroupImagePreview(null);
+        setRemoveCurrentGroupImage(false);
         setIsEditingGroup(false);
     };
 
@@ -215,30 +264,48 @@ function GroupDetail() {
             return;
         }
 
+        setIsUploadingGroupImage(true);
+
         try {
+            // Update group details
             await backend.put(`${config.backendUrl}groups/${id}`, editedGroup);
+            
+            // Handle image changes
+            if (removeCurrentGroupImage && group?.imageUrl) {
+                // Delete the current image
+                await backend.delete(`${config.backendUrl}groups/${id}/image`);
+            }
+            
+            if (selectedGroupImage) {
+                // Upload new image
+                const imageFormData = new FormData();
+                imageFormData.append('Image', selectedGroupImage);
+                await backend.put(
+                    `${config.backendUrl}groups/${id}/image`,
+                    imageFormData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }
+                );
+            }
             
             console.log('Updating group:', editedGroup);
             
-            // Update local state
-            if (group) {
-                setGroup({
-                    ...group,
-                    title: editedGroup.title,
-                    description: editedGroup.description,
-                    maxMembers: editedGroup.maxMembers,
-                    tags: editedGroup.tagIds.map(t => ({
-                        id: t, 
-                        name: tags?.filter(ti => ti.id === t)[0].name
-                    } as TagModel))
-                });
-            }
+            // Refresh group data to get updated image URL
+            await fetchGroupData();
             
+            setSelectedGroupImage(null);
+            setGroupImagePreview(null);
+            setRemoveCurrentGroupImage(false);
             setIsEditingGroup(false);
             notifySuccess('Grupės informacija atnaujinta sėkmingai')
         } catch (error) {
             console.error('Error updating group:', error);
             notifyFailure('Nepavyko atnaujinti grupės informacijos')
+        } finally {
+            setIsUploadingGroupImage(false);
         }
     };
 
@@ -359,6 +426,100 @@ function GroupDetail() {
                                             />
                                         </div>
 
+                                        {/* Group Image Edit Section */}
+                                        <div className="mb-3">
+                                            <label className="form-label">Grupės nuotrauka</label>
+                                            <div className="border rounded p-3" style={{ borderStyle: 'dashed', borderColor: '#4a5759' }}>
+                                                {groupImagePreview ? (
+                                                    <div className="text-center">
+                                                        <img 
+                                                            src={groupImagePreview} 
+                                                            alt="New Preview" 
+                                                            className="img-fluid rounded mb-3"
+                                                            style={{ maxHeight: '200px', objectFit: 'cover' }}
+                                                        />
+                                                        <div>
+                                                            <button 
+                                                                type="button" 
+                                                                className="btn btn-outline-danger btn-sm"
+                                                                onClick={handleCancelGroupImageChange}
+                                                            >
+                                                                <i className="bi bi-x me-1"></i>
+                                                                Atšaukti pakeitimą
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ) : removeCurrentGroupImage ? (
+                                                    <div className="text-center py-3">
+                                                        <p className="text-muted mb-2">Nuotrauka bus pašalinta</p>
+                                                        <button 
+                                                            type="button" 
+                                                            className="btn btn-outline-secondary btn-sm me-2"
+                                                            onClick={handleCancelGroupImageChange}
+                                                        >
+                                                            Atšaukti
+                                                        </button>
+                                                        <label className="btn btn-outline-primary btn-sm mb-0" style={{ cursor: 'pointer' }}>
+                                                            <i className="bi bi-upload me-1"></i>
+                                                            Įkelti naują
+                                                            <input
+                                                                type="file"
+                                                                ref={groupImageInputRef}
+                                                                className="d-none"
+                                                                accept="image/jpeg,image/png,image/webp"
+                                                                onChange={handleGroupImageChange}
+                                                            />
+                                                        </label>
+                                                    </div>
+                                                ) : group.imageUrl ? (
+                                                    <div className="text-center">
+                                                        <img 
+                                                            src={group.imageUrl} 
+                                                            alt="Current" 
+                                                            className="img-fluid rounded mb-3"
+                                                            style={{ maxHeight: '200px', objectFit: 'cover' }}
+                                                        />
+                                                        <div className="d-flex justify-content-center gap-2">
+                                                            <label className="btn btn-outline-primary btn-sm mb-0" style={{ cursor: 'pointer' }}>
+                                                                <i className="bi bi-pencil me-1"></i>
+                                                                Pakeisti
+                                                                <input
+                                                                    type="file"
+                                                                    ref={groupImageInputRef}
+                                                                    className="d-none"
+                                                                    accept="image/jpeg,image/png,image/webp"
+                                                                    onChange={handleGroupImageChange}
+                                                                />
+                                                            </label>
+                                                            <button 
+                                                                type="button" 
+                                                                className="btn btn-outline-danger btn-sm"
+                                                                onClick={handleRemoveGroupImage}
+                                                            >
+                                                                <i className="bi bi-trash me-1"></i>
+                                                                Pašalinti
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-center py-3">
+                                                        <i className="bi bi-cloud-upload fs-1 text-muted mb-2 d-block"></i>
+                                                        <p className="text-muted mb-2">Pasirinkite grupės nuotrauką</p>
+                                                        <input
+                                                            type="file"
+                                                            ref={groupImageInputRef}
+                                                            className="form-control"
+                                                            accept="image/jpeg,image/png,image/webp"
+                                                            onChange={handleGroupImageChange}
+                                                        />
+                                                        <div className="form-text mt-2">
+                                                            Leidžiami formatai: JPG, PNG, WebP. Maks. dydis: 5MB
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
                                         <div className="row mb-3">
                                             <div className="col-md-6">
                                                 <label htmlFor="maxMembers" className="form-label">
@@ -412,13 +573,22 @@ function GroupDetail() {
                                             <button 
                                                 type="submit"
                                                 className="btn btn-success"
+                                                disabled={isUploadingGroupImage}
                                             >
-                                                Išsaugoti
+                                                {isUploadingGroupImage ? (
+                                                    <>
+                                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                        Saugoma...
+                                                    </>
+                                                ) : (
+                                                    'Išsaugoti'
+                                                )}
                                             </button>
                                             <button 
                                                 type="button"
                                                 className="btn btn-danger"
                                                 onClick={handleEditGroupCancel}
+                                                disabled={isUploadingGroupImage}
                                             >
                                                 Atšaukti
                                             </button>

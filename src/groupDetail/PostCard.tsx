@@ -14,7 +14,8 @@ interface PostCardProps {
     onDeletePost?: (postId: number) => void,
     onEditPost?: (postId: number, newContent: string) => void,
     onDeleteComment?: (postId: number, commentId: number) => void,
-    onEditComment?: (postId: number, commentId: number, newContent: string) => void
+    onEditComment?: (postId: number, commentId: number, newContent: string) => void,
+    onPostUpdated?: () => void
 }
 
 function PostCard({
@@ -25,13 +26,15 @@ function PostCard({
     onDeletePost,
     onEditPost,
     onDeleteComment,
-    onEditComment 
+    onEditComment,
+    onPostUpdated
 }: PostCardProps) {
     const [showComments, setShowComments] = useState(true);
     const [newComment, setNewComment] = useState('');
     const [isEditingPost, setIsEditingPost] = useState(false);
     const [editedPostContent, setEditedPostContent] = useState(post.title);
     const [comments, setComments] = useState<Comment[]>([]);
+    const [currentPostImageUrl, setCurrentPostImageUrl] = useState(post.imageUrl);
     
     // Comment image upload state
     const [selectedCommentImage, setSelectedCommentImage] = useState<File | null>(null);
@@ -39,9 +42,20 @@ function PostCard({
     const [isSubmittingComment, setIsSubmittingComment] = useState(false);
     const commentFileInputRef = useRef<HTMLInputElement>(null);
 
+    // Post image edit state
+    const [selectedPostImage, setSelectedPostImage] = useState<File | null>(null);
+    const [postImagePreview, setPostImagePreview] = useState<string | null>(null);
+    const [removeCurrentPostImage, setRemoveCurrentPostImage] = useState(false);
+    const [isUploadingPostImage, setIsUploadingPostImage] = useState(false);
+    const postImageInputRef = useRef<HTMLInputElement>(null);
+
     useEffect(() => {
         fetchCommentData();
     }, []);
+
+    useEffect(() => {
+        setCurrentPostImageUrl(post.imageUrl);
+    }, [post.imageUrl]);
 
     const fetchCommentData = async () => {
         try {
@@ -90,6 +104,43 @@ function PostCard({
         setCommentImagePreview(null);
         if (commentFileInputRef.current) {
             commentFileInputRef.current.value = '';
+        }
+    };
+
+    // Post image handlers
+    const handlePostImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                notifyFailure('Netinkamas failo tipas. Leidžiami: JPG, PNG, WebP');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                notifyFailure('Failas per didelis. Maksimalus dydis: 5MB');
+                return;
+            }
+            setSelectedPostImage(file);
+            setPostImagePreview(URL.createObjectURL(file));
+            setRemoveCurrentPostImage(false);
+        }
+    };
+
+    const handleRemovePostImage = () => {
+        setSelectedPostImage(null);
+        setPostImagePreview(null);
+        setRemoveCurrentPostImage(true);
+        if (postImageInputRef.current) {
+            postImageInputRef.current.value = '';
+        }
+    };
+
+    const handleCancelPostImageChange = () => {
+        setSelectedPostImage(null);
+        setPostImagePreview(null);
+        setRemoveCurrentPostImage(false);
+        if (postImageInputRef.current) {
+            postImageInputRef.current.value = '';
         }
     };
 
@@ -142,15 +193,58 @@ function PostCard({
         }
     };
 
-    const handlePostEditSubmit = () => {
-        if (editedPostContent.trim() && editedPostContent !== post.title) {
-            onEditPost?.(post.id, editedPostContent);
+    const handlePostEditSubmit = async () => {
+        setIsUploadingPostImage(true);
+        
+        try {
+            // Update post content if changed
+            if (editedPostContent.trim() && editedPostContent !== post.title) {
+                onEditPost?.(post.id, editedPostContent);
+            }
+
+            // Handle image changes
+            if (removeCurrentPostImage && currentPostImageUrl) {
+                await backend.delete(`${config.backendUrl}groups/${groupId}/posts/${post.id}/image`);
+                setCurrentPostImageUrl('');
+            }
+
+            if (selectedPostImage) {
+                const imageFormData = new FormData();
+                imageFormData.append('Image', selectedPostImage);
+                await backend.put(
+                    `${config.backendUrl}groups/${groupId}/posts/${post.id}/image`,
+                    imageFormData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }
+                );
+                // Update the local image URL with the preview for immediate feedback
+                setCurrentPostImageUrl(postImagePreview || '');
+                notifySuccess('Įrašo nuotrauka atnaujinta!');
+            }
+
+            setSelectedPostImage(null);
+            setPostImagePreview(null);
+            setRemoveCurrentPostImage(false);
+            setIsEditingPost(false);
+            
+            // Refresh data if callback provided
+            onPostUpdated?.();
+        } catch (error) {
+            console.error('Error updating post:', error);
+            notifyFailure('Nepavyko atnaujinti įrašo');
+        } finally {
+            setIsUploadingPostImage(false);
         }
-        setIsEditingPost(false);
     };
 
     const handlePostEditCancel = () => {
         setEditedPostContent(post.title);
+        setSelectedPostImage(null);
+        setPostImagePreview(null);
+        setRemoveCurrentPostImage(false);
         setIsEditingPost(false);
     };
 
@@ -212,16 +306,119 @@ function PostCard({
                             value={editedPostContent}
                             onChange={(e) => setEditedPostContent(e.target.value)}
                         />
+                        
+                        {/* Post Image Edit Section */}
+                        <div className="mb-3">
+                            <label className="form-label small text-muted">Įrašo nuotrauka</label>
+                            <div className="border rounded p-3" style={{ borderStyle: 'dashed', borderColor: '#4a5759' }}>
+                                {postImagePreview ? (
+                                    <div className="text-center">
+                                        <img 
+                                            src={postImagePreview} 
+                                            alt="New Preview" 
+                                            className="img-fluid rounded mb-2"
+                                            style={{ maxHeight: '150px', objectFit: 'cover' }}
+                                        />
+                                        <div>
+                                            <button 
+                                                type="button" 
+                                                className="btn btn-outline-danger btn-sm"
+                                                onClick={handleCancelPostImageChange}
+                                            >
+                                                <i className="bi bi-x me-1"></i>
+                                                Atšaukti pakeitimą
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : removeCurrentPostImage ? (
+                                    <div className="text-center py-2">
+                                        <p className="text-muted small mb-2">Nuotrauka bus pašalinta</p>
+                                        <button 
+                                            type="button" 
+                                            className="btn btn-outline-secondary btn-sm me-2"
+                                            onClick={handleCancelPostImageChange}
+                                        >
+                                            Atšaukti
+                                        </button>
+                                        <label className="btn btn-outline-primary btn-sm mb-0" style={{ cursor: 'pointer' }}>
+                                            <i className="bi bi-upload me-1"></i>
+                                            Įkelti naują
+                                            <input
+                                                type="file"
+                                                ref={postImageInputRef}
+                                                className="d-none"
+                                                accept="image/jpeg,image/png,image/webp"
+                                                onChange={handlePostImageChange}
+                                            />
+                                        </label>
+                                    </div>
+                                ) : currentPostImageUrl ? (
+                                    <div className="text-center">
+                                        <img 
+                                            src={currentPostImageUrl} 
+                                            alt="Current" 
+                                            className="img-fluid rounded mb-2"
+                                            style={{ maxHeight: '150px', objectFit: 'cover' }}
+                                        />
+                                        <div className="d-flex justify-content-center gap-2">
+                                            <label className="btn btn-outline-primary btn-sm mb-0" style={{ cursor: 'pointer' }}>
+                                                <i className="bi bi-pencil me-1"></i>
+                                                Pakeisti
+                                                <input
+                                                    type="file"
+                                                    ref={postImageInputRef}
+                                                    className="d-none"
+                                                    accept="image/jpeg,image/png,image/webp"
+                                                    onChange={handlePostImageChange}
+                                                />
+                                            </label>
+                                            <button 
+                                                type="button" 
+                                                className="btn btn-outline-danger btn-sm"
+                                                onClick={handleRemovePostImage}
+                                            >
+                                                <i className="bi bi-trash me-1"></i>
+                                                Pašalinti
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-2">
+                                        <label className="btn btn-outline-secondary btn-sm mb-0" style={{ cursor: 'pointer' }}>
+                                            <i className="bi bi-image me-1"></i>
+                                            Pridėti nuotrauką
+                                            <input
+                                                type="file"
+                                                ref={postImageInputRef}
+                                                className="d-none"
+                                                accept="image/jpeg,image/png,image/webp"
+                                                onChange={handlePostImageChange}
+                                            />
+                                        </label>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
                         <div className="d-flex gap-2">
                             <button 
                                 className="btn btn-success"
                                 onClick={handlePostEditSubmit}
+                                disabled={isUploadingPostImage}
                             >
-                                Išsaugoti
+                                {isUploadingPostImage ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                        Saugoma...
+                                    </>
+                                ) : (
+                                    'Išsaugoti'
+                                )}
                             </button>
                             <button 
                                 className="btn btn-danger"
                                 onClick={handlePostEditCancel}
+                                disabled={isUploadingPostImage}
                             >
                                 Atšaukti
                             </button>
@@ -232,10 +429,10 @@ function PostCard({
                         <p className="card-text mb-3">{post.title}</p>
                         
                         {/* Post Image */}
-                        {post.imageUrl && (
+                        {currentPostImageUrl && (
                             <div className="mb-3">
                                 <img 
-                                    src={post.imageUrl}
+                                    src={currentPostImageUrl}
                                     className="img-fluid rounded" 
                                     alt="Post attachment"
                                     style={{ maxHeight: '500px', objectFit: 'cover', width: '100%' }}
@@ -316,10 +513,13 @@ function PostCard({
                                 post.comments.toReversed().map(c => (
                                     <CommentComponent 
                                         key={c.id} 
+                                        groupId={groupId}
+                                        postId={post.id}
                                         comment={c}
                                         currentUserId={currentUserId}
                                         onDelete={handleCommentDelete}
                                         onEdit={handleCommentEdit}
+                                        onCommentUpdated={fetchCommentData}
                                     />
                                 ))
                             ) : (
