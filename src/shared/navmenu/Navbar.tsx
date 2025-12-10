@@ -3,7 +3,11 @@ import appState from "../appState"
 import Auth from "../../auth/auth"
 import './navbar.css'
 
-function Navbar(){
+interface NavbarProps {
+    isSignalRConnected?: boolean;
+}
+
+function Navbar({ isSignalRConnected = false }: NavbarProps){
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
 
@@ -79,7 +83,18 @@ function Navbar(){
                             </li>
                         </ul>
 
-                        <div className="auth-section">
+                        <div className="auth-section d-flex align-items-center gap-2">
+                            {/* SignalR Connection Status Indicator */}
+                            {appState.userTitle !== "" && (
+                                <span 
+                                    className={`badge ${isSignalRConnected ? 'bg-success' : 'bg-warning'}`}
+                                    title={isSignalRConnected ? 'Pranešimai veikia realiu laiku' : 'Jungiamasi prie pranešimų...'}
+                                    style={{ fontSize: '0.7rem', padding: '0.3rem 0.5rem' }}
+                                >
+                                    <i className={`bi ${isSignalRConnected ? 'bi-wifi' : 'bi-wifi-off'} me-1`}></i>
+                                    {isSignalRConnected ? 'Live' : '...'}
+                                </span>
+                            )}
                             <Auth />
                         </div>
                     </div>
@@ -111,6 +126,18 @@ function Navbar(){
                         </ul>
 
                         <div className="auth-section-mobile">
+                            {/* Mobile SignalR Status */}
+                            {appState.userTitle !== "" && (
+                                <div className="text-center mb-2">
+                                    <span 
+                                        className={`badge ${isSignalRConnected ? 'bg-success' : 'bg-warning'}`}
+                                        style={{ fontSize: '0.7rem' }}
+                                    >
+                                        <i className={`bi ${isSignalRConnected ? 'bi-wifi' : 'bi-wifi-off'} me-1`}></i>
+                                        {isSignalRConnected ? 'Pranešimai veikia' : 'Jungiamasi...'}
+                                    </span>
+                                </div>
+                            )}
                             <Auth />
                         </div>
                     </div>

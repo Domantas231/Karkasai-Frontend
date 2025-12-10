@@ -18,6 +18,7 @@ import TagManagement from './tags/tagManagement';
 
 import appState from './shared/appState';
 import { setAuthenticatingBackend } from './shared/backend';
+import signalRService, { PostNotification, CommentNotification } from './shared/signalRService';
 
 class State {
 	isInitialized : boolean = false;
@@ -35,6 +36,7 @@ class State {
 function App() {
 	//get state container and state updater
 	const [state, setState] = useState(new State());
+	const [isSignalRConnected, setIsSignalRConnected] = useState(false);
 
 	//get ref to interact with the toast
 	const toastRef = useRef<Toast>(null);
@@ -55,6 +57,78 @@ function App() {
 			return state.shallowClone();
 		})
 	}
+
+	// Set up SignalR notification handlers
+	useEffect(() => {
+		// Handler for new post notifications
+		const unsubscribeNewPost = signalRService.onNewPost((notification: PostNotification) => {
+			// Don't show notification if the current user created the post
+			if (notification.authorName === appState.userTitle) {
+				return;
+			}
+
+			toastRef.current?.show({
+				severity: 'info',
+				summary: `Naujas įrašas grupėje "${notification.groupTitle}"`,
+				detail: `${notification.authorName}: ${notification.postTitle.substring(0, 50)}${notification.postTitle.length > 50 ? '...' : ''}`,
+				life: 5000,
+				closable: true
+			});
+		});
+
+		// Handler for new comment notifications
+		const unsubscribeNewComment = signalRService.onNewComment((notification: CommentNotification) => {
+			// Don't show notification if the current user created the comment
+			if (notification.comment.user.userName === appState.userTitle) {
+				return;
+			}
+
+			toastRef.current?.show({
+				severity: 'info',
+				summary: 'Naujas komentaras',
+				detail: `${notification.comment.user.userName}: ${notification.comment.content.substring(0, 50)}${notification.comment.content.length > 50 ? '...' : ''}`,
+				life: 4000,
+				closable: true
+			});
+		});
+
+		// Subscribe to connection state changes
+		const unsubscribeConnectionState = signalRService.onConnectionStateChange((isConnected) => {
+			setIsSignalRConnected(isConnected);
+			console.log('SignalR connection state changed:', isConnected);
+		});
+
+		// Cleanup on unmount
+		return () => {
+			unsubscribeNewPost();
+			unsubscribeNewComment();
+			unsubscribeConnectionState();
+		};
+	}, []);
+
+	// Handle SignalR connection based on login state
+	useEffect(() => {
+		const handleLoginStateChange = async () => {
+			if (appState.isLoggedIn.value && appState.authJwt) {
+				// User logged in - start SignalR connection
+				await signalRService.start();
+			} else {
+				// User logged out - stop SignalR connection
+				await signalRService.stop();
+			}
+		};
+
+		// Subscribe to login state changes
+		appState.when(appState.isLoggedIn, handleLoginStateChange);
+
+		// Initial check
+		handleLoginStateChange();
+
+		// Cleanup on unmount
+		return () => {
+			signalRService.stop();
+		};
+	}, []);
 
 	//initialize
 	if( !state.isInitialized )
@@ -93,9 +167,9 @@ function App() {
 
 	return (
 		<Router>
-			<Navbar />
+			<Navbar isSignalRConnected={isSignalRConnected} />
 			<main className="flex-shrink-0">
-				<Toast ref={toastRef}/>
+				<Toast ref={toastRef} position="top-right" />
 				
 				<Modal 
 					isOpen={state.showWelcomeModal}
