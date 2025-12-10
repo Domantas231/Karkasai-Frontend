@@ -5,6 +5,10 @@ import appState from '../appState';
 function Footer() {
     const currentYear = new Date().getFullYear();
     
+    // Check if user is logged in and admin
+    const isLoggedIn = appState.userTitle !== "";
+    const isAdmin = appState.isUserAdmin;
+    
     return (
         <footer className="site-footer mt-auto">
             <div className="footer-content">
@@ -22,9 +26,12 @@ function Footer() {
                         <div className="footer-links">
                             <h6>Nuorodos</h6>
                             <ul>
-                                { appState.userTitle != "" && (
+                                {isLoggedIn && (
                                     <>
-                                        <li><a href="/tags"><i className="bi bi-tags me-2"></i>Žymos</a></li>
+                                        {/* Only show Tags for Admins */}
+                                        {isAdmin && (
+                                            <li><a href="/tags"><i className="bi bi-tags me-2"></i>Žymos</a></li>
+                                        )}
                                         <li><a href="/new-group"><i className="bi bi-plus-circle me-2"></i>Nauja grupė</a></li>
                                     </>
                                 )}

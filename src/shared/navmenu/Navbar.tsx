@@ -36,6 +36,12 @@ function Navbar({ isSignalRConnected = false }: NavbarProps){
         }
     };
 
+    // Check if user is logged in
+    const isLoggedIn = appState.userTitle !== "";
+    
+    // Check if user is admin
+    const isAdmin = appState.isUserAdmin;
+
     return (
         <header> 
             <nav className="navbar navbar-dark fixed-top bg-dark shadow-lg">
@@ -59,7 +65,7 @@ function Navbar({ isSignalRConnected = false }: NavbarProps){
 
                     <div className="desktop-nav d-none d-md-flex align-items-center flex-grow-1">
                         <ul className="navbar-nav mx-auto mb-0 flex-row">
-                            {appState.userTitle !== "" && (
+                            {isLoggedIn && (
                                 <>
                                     <li className="nav-item">
                                         <a className="nav-link d-flex align-items-center" href="/new-group">
@@ -67,12 +73,15 @@ function Navbar({ isSignalRConnected = false }: NavbarProps){
                                             Sukurti grupę
                                         </a>
                                     </li>
-                                    <li className="nav-item">
-                                        <a className="nav-link d-flex align-items-center" href="/tags">
-                                            <i className="bi bi-tags me-2"></i>
-                                            Žymos
-                                        </a>
-                                    </li>
+                                    {/* Only show Tags management for Admins */}
+                                    {isAdmin && (
+                                        <li className="nav-item">
+                                            <a className="nav-link d-flex align-items-center" href="/tags">
+                                                <i className="bi bi-tags me-2"></i>
+                                                Žymos
+                                            </a>
+                                        </li>
+                                    )}
                                 </>
                             )}
                             <li className="nav-item">
@@ -84,24 +93,13 @@ function Navbar({ isSignalRConnected = false }: NavbarProps){
                         </ul>
 
                         <div className="auth-section d-flex align-items-center gap-2">
-                            {/* SignalR Connection Status Indicator */}
-                            {appState.userTitle !== "" && (
-                                <span 
-                                    className={`badge ${isSignalRConnected ? 'bg-success' : 'bg-warning'}`}
-                                    title={isSignalRConnected ? 'Pranešimai veikia realiu laiku' : 'Jungiamasi prie pranešimų...'}
-                                    style={{ fontSize: '0.7rem', padding: '0.3rem 0.5rem' }}
-                                >
-                                    <i className={`bi ${isSignalRConnected ? 'bi-wifi' : 'bi-wifi-off'} me-1`}></i>
-                                    {isSignalRConnected ? 'Live' : '...'}
-                                </span>
-                            )}
                             <Auth />
                         </div>
                     </div>
 
                     <div className={`mobile-nav d-md-none ${isMenuOpen ? 'show' : ''}`} id="navbarMain">
                         <ul className="navbar-nav">
-                            {appState.userTitle !== "" && (
+                            {isLoggedIn && (
                                 <>
                                     <li className="nav-item">
                                         <a className="nav-link" href="/new-group" onClick={handleLinkClick}>
@@ -109,12 +107,15 @@ function Navbar({ isSignalRConnected = false }: NavbarProps){
                                             Sukurti grupę
                                         </a>
                                     </li>
-                                    <li className="nav-item">
-                                        <a className="nav-link" href="/tags" onClick={handleLinkClick}>
-                                            <i className="bi bi-tags me-2"></i>
-                                            Žymos
-                                        </a>
-                                    </li>
+                                    {/* Only show Tags management for Admins */}
+                                    {isAdmin && (
+                                        <li className="nav-item">
+                                            <a className="nav-link" href="/tags" onClick={handleLinkClick}>
+                                                <i className="bi bi-tags me-2"></i>
+                                                Žymos
+                                            </a>
+                                        </li>
+                                    )}
                                 </>
                             )}
                             <li className="nav-item">
@@ -126,18 +127,6 @@ function Navbar({ isSignalRConnected = false }: NavbarProps){
                         </ul>
 
                         <div className="auth-section-mobile">
-                            {/* Mobile SignalR Status */}
-                            {appState.userTitle !== "" && (
-                                <div className="text-center mb-2">
-                                    <span 
-                                        className={`badge ${isSignalRConnected ? 'bg-success' : 'bg-warning'}`}
-                                        style={{ fontSize: '0.7rem' }}
-                                    >
-                                        <i className={`bi ${isSignalRConnected ? 'bi-wifi' : 'bi-wifi-off'} me-1`}></i>
-                                        {isSignalRConnected ? 'Pranešimai veikia' : 'Jungiamasi...'}
-                                    </span>
-                                </div>
-                            )}
                             <Auth />
                         </div>
                     </div>

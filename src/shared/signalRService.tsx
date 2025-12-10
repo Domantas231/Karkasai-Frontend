@@ -17,10 +17,12 @@ export interface PostNotification {
 export interface PostDeletedNotification {
     groupId: number;
     postId: number;
+    groupTitle: string;
 }
 
 export interface PostUpdatedNotification {
     groupId: number;
+    groupTitle: string;
     post: {
         id: number;
         title: string;
@@ -33,6 +35,7 @@ export interface PostUpdatedNotification {
 export interface CommentNotification {
     groupId: number;
     postId: number;
+    postAuthorName: string;
     comment: {
         id: number;
         content: string;
@@ -42,6 +45,14 @@ export interface CommentNotification {
     };
 }
 
+export interface GroupNotification {
+    groupId: number;
+    title: string;
+    description: string;
+    ownerName: string;
+    createdAt: string;
+}
+
 /**
  * Callback types for notification handlers
  */
@@ -49,6 +60,7 @@ type NewPostHandler = (notification: PostNotification) => void;
 type PostDeletedHandler = (notification: PostDeletedNotification) => void;
 type PostUpdatedHandler = (notification: PostUpdatedNotification) => void;
 type NewCommentHandler = (notification: CommentNotification) => void;
+type NewGroupHandler = (notification: GroupNotification) => void;
 type ConnectionStateHandler = (isConnected: boolean) => void;
 
 /**
@@ -66,6 +78,7 @@ class SignalRService {
     private onPostDeletedHandlers: PostDeletedHandler[] = [];
     private onPostUpdatedHandlers: PostUpdatedHandler[] = [];
     private onNewCommentHandlers: NewCommentHandler[] = [];
+    private onNewGroupHandlers: NewGroupHandler[] = [];
     private onConnectionStateHandlers: ConnectionStateHandler[] = [];
 
     /**
@@ -288,6 +301,16 @@ class SignalRService {
     }
 
     /**
+     * Subscribe to new group notifications
+     */
+    onNewGroup(handler: NewGroupHandler): () => void {
+        this.onNewGroupHandlers.push(handler);
+        return () => {
+            this.onNewGroupHandlers = this.onNewGroupHandlers.filter(h => h !== handler);
+        };
+    }
+
+    /**
      * Subscribe to connection state changes
      */
     onConnectionStateChange(handler: ConnectionStateHandler): () => void {
@@ -337,6 +360,11 @@ class SignalRService {
         this.connection.on('NewComment', (notification: CommentNotification) => {
             console.log('SignalR: New comment received', notification);
             this.onNewCommentHandlers.forEach(handler => handler(notification));
+        });
+
+        this.connection.on('NewGroup', (notification: GroupNotification) => {
+            console.log('SignalR: New group created', notification);
+            this.onNewGroupHandlers.forEach(handler => handler(notification));
         });
     }
 

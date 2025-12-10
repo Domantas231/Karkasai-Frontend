@@ -3,6 +3,7 @@ import { Subject } from "rxjs";
 import { ToastMessage } from 'primereact/toast';
 
 import { ObservableClass } from "./observable";
+import { getUserRoles, isAdmin as checkIsAdmin, isTokenExpired } from "./jwtutils";
 
 
 const STORAGE_KEY = "HabitTribe.frontend.AppState"
@@ -47,7 +48,46 @@ class AppState extends ObservableClass {
 	/** Authentication token. Getter. */
 	get authJwt() : string | null {
 		return window.sessionStorage.getItem(`${STORAGE_KEY}#jwt`);
-	}	
+	}
+
+	/**
+	 * Get user roles from JWT token.
+	 * @returns Array of role names
+	 */
+	get userRoles(): string[] {
+		const jwt = this.authJwt;
+		if (!jwt) return [];
+		return getUserRoles(jwt);
+	}
+
+	/**
+	 * Check if current user is an admin.
+	 * @returns True if user has Admin role
+	 */
+	get isUserAdmin(): boolean {
+		const jwt = this.authJwt;
+		if (!jwt) return false;
+		return checkIsAdmin(jwt);
+	}
+
+	/**
+	 * Check if current user has a specific role.
+	 * @param role Role name to check
+	 * @returns True if user has the specified role
+	 */
+	hasRole(role: string): boolean {
+		return this.userRoles.includes(role);
+	}
+
+	/**
+	 * Check if the current JWT token is expired.
+	 * @returns True if token is expired or not present
+	 */
+	get isTokenExpired(): boolean {
+		const jwt = this.authJwt;
+		if (!jwt) return true;
+		return isTokenExpired(jwt);
+	}
 }
 
 //export default instance

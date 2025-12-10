@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Navbar } from './shared/navmenu/Navbar';
 import { Footer } from './shared/footer/Footer';
 import Modal from './shared/modal/modal';
+import { ProtectedRoute, AdminRoute, AuthRoute } from './shared/protectedroute';
 
 import About from './about/About';
 import Groups from './groups/Groups';
@@ -190,13 +191,30 @@ function App() {
 				</Modal>
 
 				<Routes>
+					{/* Public routes */}
 					<Route path="/" element={<About />}/>
 					<Route path="/groups" element={<Groups />}/>
-					<Route path="/group/:id" element={<GroupDetail />}/>
-					<Route path="/new-group" element={<NewGroup />}/>
-					<Route path="/tags" element={<TagManagement />}/>
 					<Route path="/login" element={<Login />}/>
 					<Route path="/register" element={<Register />}/>
+					
+					{/* Protected routes - require authentication */}
+					<Route path="/group/:id" element={
+						<AuthRoute>
+							<GroupDetail />
+						</AuthRoute>
+					}/>
+					<Route path="/new-group" element={
+						<AuthRoute>
+							<NewGroup />
+						</AuthRoute>
+					}/>
+					
+					{/* Admin-only routes */}
+					<Route path="/tags" element={
+						<AdminRoute>
+							<TagManagement />
+						</AdminRoute>
+					}/>
 				</Routes>
 			</main>
 			<Footer />
